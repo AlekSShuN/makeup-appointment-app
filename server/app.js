@@ -1,8 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const bookingsRouter = require('./routes/bookings.js');
-const servisRouter = require('./routes/servis.js');
-const healthRouter = require('./routes/health');
+import express from 'express';
+import cors from 'cors';
+import bookingsRouter from './routes/bookings.js';
+import servisRouter from './routes/servis.js';
+import healthRouter from './routes/health.js';
 
 const app = express();
 
@@ -23,4 +23,4 @@ app.use('*', (req, res) => {
     });
 });
 
-module.exports = app;
+export default app;

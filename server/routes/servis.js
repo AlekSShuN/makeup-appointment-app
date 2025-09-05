@@ -1,15 +1,14 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const path = require('path');
-const fs = require('fs').promises;
+import path from 'path';
+import fs from 'fs/promises';
 
-const servisPath = path.join(__dirname, '..//data/servis.json');
-
+const servicesPath = path.join(process.cwd(), 'server', 'data', 'servis.json');
 //GET запрос для получения данных услуг
 
 router.get('/', async (req, res) => {
     try {
-        const data = await fs.readFile(servisPath,);
+        const data = await fs.readFile(servicesPath,);
         const servis = JSON.parce(data);
         res.json(servis);
     } catch (error) {
@@ -18,4 +17,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

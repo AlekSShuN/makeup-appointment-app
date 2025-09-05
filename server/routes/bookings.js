@@ -1,9 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const path = require('path');
-const fs = require('fs').promises;
+import path from 'path';
+import fs from 'fs/promises';
 
-const bookingsPath = path.join(__dirname, '../data/bookings.json');
+
+const bookingsPath = path.join(process.cwd(), 'server', 'data', 'bookings.json');
 
 router.get('/', async (req, res) => {
     try {
@@ -29,4 +30,4 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-module.export = router;
+export default router;
