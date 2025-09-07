@@ -1,11 +1,12 @@
 import { Outlet } from 'react-router-dom';
 import Header from '../Header/Header.jsx';
 import Footer from '../Footer/Footer.jsx';
-import style from './Wrapper.module.css';
+import React from 'react';
 
-const Wrapper = () => {
+
+const Layout = () => {
     return (
-        <div className={style.layot}>
+        <div className={style.layout}>
             <Header />
             <main className={style.main}>
                 <Outlet />
@@ -15,4 +16,4 @@ const Wrapper = () => {
     );
 };
 
-export default Wrapper;
+export default Layout;
