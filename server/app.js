@@ -4,6 +4,7 @@ import bookingsRouter from './routes/bookings.js';
 import servisRouter from './routes/servis.js';
 import healthRouter from './routes/health.js';
 
+
 const app = express();
 
 app.use(cors());
