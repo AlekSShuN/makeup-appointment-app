@@ -8,12 +8,12 @@ const servicesPath = path.join(process.cwd(), 'server', 'data', 'servis.json');
 
 router.get('/', async (req, res) => {
     try {
-        const data = await fs.readFile(servicesPath,);
-        const servis = JSON.parce(data);
+        const data = await fs.readFile(servicesPath, 'utf8');
+        const servis = JSON.parse(data);
         res.json(servis);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ messge: 'error reading service data' });
+        res.status(500).json({ message: 'error reading service data' });
     }
 });
 
