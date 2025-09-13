@@ -11,7 +11,7 @@ const Booking = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await fetch('http://localhost:5000/data/services');
+                const response = await fetch('http://localhost:5000/api/services');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
