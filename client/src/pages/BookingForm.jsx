@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styles from './BookingForm.module.css';
 
 
 const BookingForm = ({ services }) => {
@@ -9,6 +10,10 @@ const BookingForm = ({ services }) => {
     const [clientData, setClientData] = useState({ name: '', phone: '', email: '', comment: '' });
     const [isSend, setIsSend] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
+
+    const safeServices = Array.isArray(services) ? services : [];
+
+
 
     //Выбор даты
     const datePickerHandler = async (e) => {
@@ -76,7 +81,7 @@ const BookingForm = ({ services }) => {
                     onChange={(e) => setSelectedService(e.target.value)}
                     required>
                     <option value="">Выберите услугу </option>
-                    {services.map(service => (
+                    {safeServices.map(service => (
                         <option key={service.id} value={service.id}>
                             {service.name} ({service.price}руб.)
                         </option >

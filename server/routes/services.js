@@ -13,8 +13,22 @@ router.get('/', async (req, res) => {
         res.json(servis);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'error reading service data' });
+        if (error.code === 'ENOENT') {
+            return res.json({
+                success: true,
+                data: [
+                    { id: 1, name: 'Макияж', price: 2500 },
+                    { id: 2, name: 'Прическа', price: 3000 },
+                    { id: 3, name: 'Маникюр', price: 2000 }
+                ]
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Error reading service data',
+            error: error.message
+        });
     }
 });
-
 export default router;
