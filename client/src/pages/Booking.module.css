@@ -1,0 +1,16 @@
+.booking {
+    padding: 60px 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.booking h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.booking>p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+}

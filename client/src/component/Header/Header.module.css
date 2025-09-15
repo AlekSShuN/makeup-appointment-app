@@ -1,0 +1,102 @@
+.header {
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.navList {
+    display: flex;
+    gap: 2rem;
+}
+
+.navList a {
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+.navList a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: var(--transition);
+}
+
+.navList a:hover::after,
+.navList a.active::after {
+    width: 100%;
+}
+
+.bookingLink {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.bookingLink:hover {
+    background-color: var(--primary-dark);
+}
+
+.bookingLink::after {
+    display: none;
+}
+
+/* Мобильное меню */
+.menuToggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.menuToggle span {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-color);
+    margin: 2px 0;
+    transition: var(--transition);
+}
+
+@media (max-width: 768px) {
+    .menuToggle {
+        display: flex;
+    }
+
+    .navList {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background-color: var(--white);
+        width: 100%;
+        height: calc(100vh - 70px);
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        gap: 1.5rem;
+    }
+
+    .navList.active {
+        left: 0;
+    }
+}
