@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import style from './Booking.module.css';
+import styles from './Booking.module.css';
 import BookingForm from './BookingForm.jsx';
 
 const Booking = () => {
@@ -26,9 +26,9 @@ const Booking = () => {
         fetchServices();
     }, []);
 
-    if (loading) return <div className={style.loading}>Загрузка услуг</div>;
+    if (loading) return <div className={styles.loading}>Загрузка услуг</div>;
 
-    if (error) return <div className={style.error}>
+    if (error) return <div className={styles.error}>
         <h3>Не удалось загрузить услуги</h3>
         <p>{error}</p>
         <button onClick={() => window.location.reload()}>Попробовать снова</button>
@@ -39,9 +39,9 @@ const Booking = () => {
     }
 
     return (
-        <div className={style.Booking}>
-            <h1>Записаться на услугу</h1>
-            <p>Выберите услугу и время</p>
+        <div className={styles.Booking}>
+            <h1 className={styles.title}>Записаться на услугу</h1>
+            <p className={styles.sub_title}>Выберите услугу и время</p>
             <BookingForm services={services} />
         </div>
     );

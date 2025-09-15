@@ -5,7 +5,17 @@
 }
 
 :root {
-    background-color: cornsilk;
+    --primary-color: #f8d7da;
+    --primary-dark: #f1b0b7;
+    --secondary-color: #fcebec;
+    --accent-color: #ff85a2;
+    --text-color: #333;
+    --text-light: #777;
+    --white: #ffffff;
+    --pink-light: #fdf2f4;
+    --pink-medium: #f9d5e0;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
 }
 
 body {
@@ -13,13 +23,24 @@ body {
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--pink-light);
-    /* Основной фон в розовых тонах */
     background-image:
         radial-gradient(var(--pink-medium) 1px, transparent 1px),
         radial-gradient(var(--pink-medium) 1px, transparent 1px);
     background-size: 40px 40px;
     background-position: 0 0, 20px 20px;
     background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: sans-serif;
+}
+
+html,
+#root {
+    height: 100%;
 }
 
 a {
@@ -40,135 +61,11 @@ img {
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    min-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Кнопки */
-.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: var(--transition);
-    text-align: center;
-}
-
-.btn:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    background-color: transparent;
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--primary-color);
-    color: var(--white);
-}
-
-/* Заголовки */
-h1,
-h2,
-h3,
-h4 {
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-
-h1 {
-    font-size: 2.5rem;
-}
-
-h2 {
-    font-size: 2rem;
-}
-
-h3 {
-    font-size: 1.5rem;
-}
-
-/* Секции */
-.section {
-    padding: 60px 0;
-}
-
-.section-title {
-    text-align: center;
-    margin-bottom: 2rem;
-    position: relative;
-}
-
-.section-title::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 2px;
-    background-color: var(--primary-color);
-    margin: 15px auto 0;
-}
-
-/* Формы */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-input,
-select,
-textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition: var(--transition);
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(212, 175, 154, 0.2);
-}
-
-/* Утилиты */
-.text-center {
-    text-align: center;
-}
-
-.mt-1 {
-    margin-top: 1rem;
-}
-
-.mt-2 {
-    margin-top: 2rem;
-}
-
-.mb-1 {
-    margin-bottom: 1rem;
-}
-
-.mb-2 {
-    margin-bottom: 2rem;
-}
-
-/* Анимации */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -179,8 +76,4 @@ textarea:focus {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.fade-in {
-    animation: fadeIn 0.6s ease forwards;
 }

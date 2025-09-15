@@ -68,75 +68,109 @@ const BookingForm = ({ services }) => {
         } catch (error) {
             setSubmitMessage('Ошибка в отправке. Попробуйте еще раз');
         } finally {
-            setSubmitMessage(false);
+            setIsSend(false);
         }
     };
 
     return (
         <form onSubmit={formSubmissionHandel} className={styles.form}>
             {/*выбор услуги*/}
-            <label>Услуга:
+            <div className={styles.form_group}>
+                <label className={styles.label_service}>Услуга: </label>
                 <select
                     value={selectedService}
                     onChange={(e) => setSelectedService(e.target.value)}
+                    className={styles.select}
                     required>
-                    <option value="">Выберите услугу </option>
+                    <option className={styles.select_service} value="">Выберите услугу </option>
                     {safeServices.map(service => (
                         <option key={service.id} value={service.id}>
                             {service.name} ({service.price}руб.)
                         </option >
                     ))}
                 </select>
-            </label>
+            </div>
+
 
             {/*Выбор даты*/}
-            <label>Дата:
+            <div className={styles.form_group}>
+                <label className={styles.label}>Дата: </label>
                 <input type="date"
                     value={selectedDate}
                     onChange={datePickerHandler}
+                    className={styles.input}
                     min={new Date().toISOString().split('T')[0]}
                     required />
-            </label>
+            </div>
 
             {/*Выбор времени */}
             {availableSlots.length > 0 && (
-                <label >Доступное время:
-                    <select
-                        value={selectedTime}
-                        onChange={(e) => setSelectedTime(e.target.value)}
-                        required>
-                        <option value="">Выберите время</option>
-                        {availableSlots.map(slot => {
-                            <option key={slot} value={slot}>{slot}</option>
-                        })};
-                    </select>
-                </label>
+                <div className={styles.form_group}>
+                    <label className={styles.label}>Доступное время: </label>
+                    <div className={styles.time_slots}>
+                        {availableSlots.map(slot => (
+                            <button
+                                key={slot}
+                                type="button"
+                                className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''}`}
+                                onClick={() => setSelectedTime(slot)}>
+                                {slot}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             )}
 
             {/*Данные клиента */}
-            <label>Имя:
+            <div className={styles.form_group}>
+                <label className={styles.label}>Имя:</label>
                 <input type="text"
                     value={clientData.name}
                     onChange={(e) => setClientData({ ...clientData, name: e.target.value })}
+                    className={styles.input}
                     required />
-            </label>
-            <label>Телефон:
+            </div>
+
+            <div className={styles.form_group}>
+                <label className={styles.label}>Телефон:</label>
                 <input type="tel"
                     value={clientData.phone}
                     onChange={(e) => setClientData({ ...clientData, phone: e.target.value })}
+                    className={styles.input}
                     required />
-            </label>
-            <label>email:
+            </div>
+
+            <div className={styles.form_group}>
+                <label className={styles.label}>email: </label>
                 <input type="email"
                     value={clientData.email}
-                    onChange={(e) => setClientData({ ...clientData, email: e.target.value })} />
-            </label>
+                    onChange={(e) => setClientData({ ...clientData, email: e.target.value })}
+                    className={styles.input}
+                />
+            </div>
 
-            <button type="submit" disabled={isSend}>
+            <div className={styles.form_group}>
+                <label className={styles.label}>Комментарии:</label>
+                <textarea
+                    value={clientData.comment}
+                    onChange={(e) => setClientData({ ...clientData, comment: e.target.value })}
+                    className={styles.textarea}
+                    rows="4"
+                />
+            </div>
+
+            <button
+                className={styles.submit_button}
+                type="submit"
+                disabled={isSend}>
                 {isSend ? 'Отправка' : 'Отправить заявку'}
             </button>
 
-            {submitMessage && <p>{submitMessage}</p>}
+            {submitMessage && (
+                <div className={`${styles.message} ${submitMessage.includes('ошибка') ? styles.error : styles.success}`}>
+                    {submitMessage}
+                </div>
+            )}
         </ form >
     );
 };

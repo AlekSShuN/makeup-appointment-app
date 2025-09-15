@@ -17,6 +17,11 @@ const Header = () => {
                     <li><Link to="/contacts" className={location.pathname === '/contacts' ? styles.active : ''}>Контакты</Link></li>
                     <li><Link to="/" className={`${styles.bookingLink} ${location.pathname === '/booking' ? styles.active : ''}`}>Запись</Link></li>
                 </ul>
+                <div className={styles.menuToggle}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </nav>
         </header >
     );

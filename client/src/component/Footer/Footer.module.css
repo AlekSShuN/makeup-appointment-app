@@ -1,23 +1,40 @@
 .footer {
-    background-color: var(--secondary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--pink-medium));
     padding: 2rem 0;
     text-align: center;
+    margin-top: auto;
+    border-top: 3px solid var(--accent-color);
+}
+
+.container {
+    min-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 .socials {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    margin-top: 1rem;
+    gap: 3rem;
+    margin-top: 2rem;
+
 }
 
-.socials a {
-    display: inline-block;
-    padding: 0.5rem;
+.socialLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 20px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 1.2rem;
     transition: var(--transition);
+
 }
 
-.socials a:hover {
-    color: var(--primary-color);
+.socialLink:hover {
+    background-color: var(--primary-dark);
     transform: translateY(-3px);
 }
