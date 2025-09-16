@@ -8,7 +8,7 @@ const BookingForm = ({ services }) => {
     const [availableSlots, setAvailebleSlots] = useState([]);
     const [selectedTime, setSelectedTime] = useState('');
     const [clientData, setClientData] = useState({ name: '', phone: '', email: '', comment: '' });
-    const [isSend, setIsSend] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
 
     const safeServices = Array.isArray(services) ? services : [];
@@ -21,11 +21,11 @@ const BookingForm = ({ services }) => {
         setSelectedDate(date);
         setSelectedTime('');
 
-        if (!date || setSelectedService)
+        if (!date || !selectedService)
             return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/booking/booking_slots?date=${date}`);
+            const response = await fetch(`http://localhost:5000/api/bookings/booking-slots?date=${date}`);
             const slots = await response.json();
             setAvailebleSlots(slots);
         } catch (error) {
@@ -36,7 +36,7 @@ const BookingForm = ({ services }) => {
     //отправка формы
     const formSubmissionHandel = async (e) => {
         e.preventDefault();
-        setSubmiting(true);
+        setIsSubmitting(true);
 
         const bookingDate = {
             serviceId: parseInt(selectedService),
@@ -49,7 +49,7 @@ const BookingForm = ({ services }) => {
             const response = await fetch('http://localhost:5000/api/bookings', {
                 method: 'POST',
                 headers: {
-                    'content-type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(bookingDate),
             });
@@ -162,8 +162,8 @@ const BookingForm = ({ services }) => {
             <button
                 className={styles.submit_button}
                 type="submit"
-                disabled={isSend}>
-                {isSend ? 'Отправка' : 'Отправить заявку'}
+                disabled={isSubmitting}>
+                {isSubmitting ? 'Отправка' : 'Отправить заявку'}
             </button>
 
             {submitMessage && (
