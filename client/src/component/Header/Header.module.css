@@ -30,6 +30,9 @@
     position: relative;
     padding: 0.5rem 0;
     font-weight: 500;
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .navList a:after {

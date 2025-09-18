@@ -137,6 +137,52 @@
 
 }
 
+.error {
+    border-color: #e74c3c;
+    background-color: #fdf2f2;
+}
+
+.errorText {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+.error:focus {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.label::after {
+    content: '*';
+    color: #e74c3c;
+    margin-left: 3px;
+}
+
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.error {
+    animation: shake 0.3s, ease-in-out;
+}
+
+
 @media (max-width: 768px) {
     .fornm {
         padding: 1.5rem;
