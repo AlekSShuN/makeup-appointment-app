@@ -8,7 +8,7 @@ const Home = () => {
     const slides = [
         {
             image: "/public/slider/slider1.jpg",
-            alt: "Макияж"
+            alt: "Макияж",
         },
         {
             image: "/public/slider/slider2.jpg",
