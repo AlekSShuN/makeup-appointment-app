@@ -15,7 +15,7 @@ const Header = () => {
                     <li><Link to="/services" className={location.pathname === '/services' ? styles.active : ''}>Услуги</Link></li>
                     <li><Link to="/portfolio" className={location.pathname === '/portolio' ? styles.active : ''}>Портфолио</Link></li>
                     <li><Link to="/contacts" className={location.pathname === '/contacts' ? styles.active : ''}>Контакты</Link></li>
-                    <li><Link to="/" className={`${styles.bookingLink} ${location.pathname === '/booking' ? styles.active : ''}`}>Запись</Link></li>
+                    <li><Link to="/booking" className={`${styles.bookingLink} ${location.pathname === '/booking' ? styles.active : ''}`}>Запись</Link></li>
                 </ul>
                 <div className={styles.menuToggle}>
                     <span></span>
