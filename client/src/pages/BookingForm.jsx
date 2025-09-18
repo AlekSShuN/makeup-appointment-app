@@ -7,19 +7,12 @@ const BookingForm = ({ services }) => {
     const [selectedDate, setSelectedDate] = useState('');
     const [availableSlots, setAvailableSlots] = useState([]);
     const [selectedTime, setSelectedTime] = useState('');
-    const [clientData, setClientData] = useState({
-        name: '',
-        phone: '',
-        email: '',
-        comment: ''
-    });
+    const [clientData, setClientData] = useState({ name: '', phone: '', email: '', comment: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
     const [touched, setTouched] = useState({});
-
     const { errors, validateForm, clearError, clearAllErrors } = useValidation();
 
-    // Дебаунс для избежания частых валидаций
     const validateFormDebounced = useCallback(() => {
         if (Object.keys(touched).length > 0) {
             validateForm({
@@ -47,20 +40,13 @@ const BookingForm = ({ services }) => {
         clearError('date');
 
         if (!date || !selectedService) {
-            setAvailableSlots([]);
             return;
         }
 
         try {
-            const response = await fetch(
-                `http://localhost:5000/api/bookings/booking-slots?date=${date}&serviceId=${selectedService}`
-            );
-            if (response.ok) {
-                const slots = await response.json();
-                setAvailableSlots(slots);
-            } else {
-                setAvailableSlots([]);
-            }
+            const response = await fetch(`http://localhost:5000/api/bookings/booking-slots?date=${date}&serviceId=${selectedService}`);
+            const slots = await response.json();
+            setAvailableSlots(slots);
         } catch (error) {
             console.error('Error fetching slots:', error);
             setAvailableSlots([]);
@@ -103,7 +89,6 @@ const BookingForm = ({ services }) => {
     const formSubmissionHandler = async (event) => {
         event.preventDefault();
 
-        // Помечаем все поля как touched
         const allTouchedFields = {
             serviceId: true,
             date: true,
