@@ -1,5 +1,5 @@
 .footer {
-    background: linear-gradient(135deg, var(--primary-color), var(--pink-medium));
+    background: var(--primary-color);
     padding: 2rem 0;
     text-align: center;
     margin-top: auto;
@@ -7,16 +7,18 @@
 }
 
 .container {
-    min-width: 1200px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
 }
 
 .socials {
     display: flex;
     justify-content: center;
     gap: 3rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
 
 }
 
@@ -25,16 +27,54 @@
     align-items: center;
     justify-content: center;
     width: 40px;
-    height: 20px;
+    height: 40px;
     background-color: var(--primary-color);
     color: var(--white);
     border-radius: 50%;
     font-size: 1.2rem;
-    transition: var(--transition);
-
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    border: 2px solid var(--white);
 }
 
 .socialLink:hover {
     background-color: var(--primary-dark);
     transform: translateY(-3px);
+}
+
+/*Адаптивность*/
+@media (max-width: 768px) {
+    .footer {
+        padding: 1.5rem 0;
+    }
+
+    .socials {
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .socialLink {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        padding: 1rem 0;
+    }
+
+    .social {
+        gap: 1rem;
+    }
+
+    .socialLink {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
 }

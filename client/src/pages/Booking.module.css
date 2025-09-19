@@ -1,5 +1,5 @@
 .booking {
-    padding: 80px 0;
+    padding: 60px 0;
     min-height: 100vh;
     background: linear-gradient(135deg, var(--secondary-color), var(--pink-light));
 }
@@ -7,7 +7,7 @@
 .container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--container-padding);
 }
 
 .title {
@@ -16,14 +16,117 @@
     font-size: 2.5rem;
     color: var(--text-color);
     font-weight: 600;
+    font-family: serif;
 }
 
 .sub_title {
     text-align: center;
     padding: 3rem;
     font-size: 1.2rem;
+    color: var(--text-ligth);
+    line-height: 1.6;
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
 }
 
 .error {
     color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 10px;
+    margin: 2rem auto;
+    max-width: 500px;
+}
+
+/*Адаптивность под мобильные*/
+@media (max-width: 768px) {
+    .booking {
+        padding: 40px 0;
+    }
+
+    .title {
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .sub_title {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .loading,
+    .error {
+        padding: 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking {
+        padding: 30px 0;
+    }
+
+    .title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .sub_title {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    .loading,
+    .error {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/*Анимации*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    animation: fadeIn 0.6s ease;
+}
+
+.sub_title {
+    animation: fadeIn 0.6s ease 0.2s both;
+}
+
+/* Улучшение читаемости */
+@media (max-width: 768px) {
+    .booking {
+        background: linear-gradient(135deg, var(--secondary-color), var(--pink-light));
+    }
+}
+
+/* Предотвращение горизонтального скролла */
+.booking {
+    overflow-x: hidden;
 }

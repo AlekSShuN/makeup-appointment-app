@@ -1,17 +1,20 @@
 .header {
-    background-color: var(--white);
+    background-color: rgba(255, 255, 255, 0.95);
     box-shadow: var(--shadow);
     position: sticky;
     top: 0;
     z-index: 100;
     backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 0;
 }
 
 .nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
 }
 
 .logo {
@@ -19,10 +22,12 @@
     font-weight: bold;
     color: var(--primary-color);
     font-family: serif;
+    z-index: 101;
 }
 
 .navList {
     display: flex;
+    align-items: center;
     gap: 2rem;
 }
 
@@ -30,9 +35,9 @@
     position: relative;
     padding: 0.5rem 0;
     font-weight: 500;
-    color: -webkit-link;
+    color: var(--text-color);
     cursor: pointer;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .navList a:after {
@@ -57,51 +62,146 @@
     padding: 0.5rem 1.5rem;
     border-radius: 25px;
     font-weight: 600;
+    transition: var(--transition);
 }
 
 .bookingLink:hover {
     background-color: var(--primary-dark);
     transform: translateY(2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .bookingLink::after {
     display: none;
 }
 
+
+/*Мобильное меню*/
 .menuToggle {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    z-index: 101;
 }
 
 .menuToggle span {
     width: 25px;
-    height: 2px;
+    height: 3px;
     border-color: var(--text-color);
     margin: 3px 0;
     transition: var(--transition);
+    border-radius: 2px;
 }
 
+
+
 @media (max-width: 768px) {
+    .header {
+        padding: 0.8rem 0;
+    }
+
     .menuToggle {
         display: flex;
     }
 
     .navList {
         position: fixed;
-        top: 70px;
+        top: 0;
         left: -100%;
         font-display: column;
         background-color: var(--white);
         width: 100%;
-        height: calc(100vh - 70px);
-        padding: 2rem;
-        box-shadow: var(--shadow);
+        height: 100vh;
+        padding: 80px 2rem 2rem;
         transition: var(--transition);
         gap: 1.5rem;
+        justify-content: center;
+        align-items: center;
     }
 
     .navList:active {
         left: 0;
     }
+
+    .navList a {
+        font-size: 1.2rem;
+        padding: 1rem 0;
+    }
+
+    .bookingLink {
+        padding: 1rem 2rem;
+        font-size: 1.1 rem;
+    }
+}
+
+/*Адаптив под 480px*/
+@media (max-width: 480px) {
+    .nav {
+        padding: 0 15px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .navList {
+        padding: 70px 1.5rem 1.5rem;
+    }
+
+    .navList a {
+        font-size: 1.2rem;
+    }
+
+    .bookingLink {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/*Плавная анимация для меню*/
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.navList {
+    animation: slideOut 0.3s ease forwards;
+}
+
+.navList.active {
+    animation: slideIn 0.3s ease forwards;
+}
+
+/* Улучшение доступности */
+.menuToggle:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.navList a:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+body.menu-open {
+    overflow: hidden;
 }

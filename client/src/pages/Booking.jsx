@@ -26,26 +26,41 @@ const Booking = () => {
         fetchServices();
     }, []);
 
-    if (loading) return <div className={styles.loading}>Загрузка услуг</div>;
+    if (loading) {
+        return (
+            <div className={styles.booking}>
+                <div className={styles.container}>
+                    <div className={styles.loading}>Загрузка услуг</div>
+                </div>
+            </div>
+        );
+    }
 
-    if (error) return <div className={styles.error}>
-        <h3>Не удалось загрузить услуги</h3>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Попробовать снова</button>
-    </div>;
-
-    if (!loading && !error && services.length === 0) {
-        return <div>Нет доступных услуг для записи</div>;
+    if (error) {
+        return (
+            <div className={styles.booking}>
+                <div className={styles.container}>
+                    <div className={styles.error}>
+                        Ошибка: {error}
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className={styles.Booking}>
-            <h1 className={styles.title}>Записаться на услугу</h1>
-            <p className={styles.sub_title}>Выберите услугу и время</p>
-            <BookingForm services={services} />
+        <div className={styles.booking}>
+            <div className={styles.container}>
+                <h1 className={styles.title}>Запись на услугу</h1>
+                <p className={styles.sub_title}>
+                    Выберите услугу и удобное время для визита. Мы свяжемся с вами для подтверждения записи.
+                </p>
+                <BookingForm services={services} />
+            </div>
         </div>
     );
 };
+
 
 
 
