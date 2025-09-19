@@ -17,6 +17,7 @@
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --shadow-mobile: 0 1px 5px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s ease;
+    --flower-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30,15 Q40,5 45,15 T60,30 T45,45 T30,60 T15,45 T0,30 T15,15 T30,15' fill='none' stroke='%23f8d7da' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 body {
@@ -194,5 +195,61 @@ img {
     body {
         overflow-x: hidden;
         position: relative;
+    }
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(248, 215, 218, 0.2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #ff85a2, #ff6b9d);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #ff6b9d, #ff4d87);
+}
+
+/* Анимации */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(5deg);
+    }
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
     }
 }

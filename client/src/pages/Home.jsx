@@ -57,6 +57,11 @@ const Home = () => {
     return (
         <div className={styles.home}>
             <section className={styles.hero}>
+                <div className={styles.sparkle}></div>
+                <div className={styles.sparkle}></div>
+                <div className={styles.sparkle}></div>
+                <div className={styles.sparkle}></div>
+                <div className={styles.sparkle}></div>
                 <div className={styles.heroSlider}>
                     {slides.map((slides, index) => (
                         <div
@@ -68,7 +73,7 @@ const Home = () => {
                 </div>
                 {/*Контект поверх слидера*/}
                 <div className={styles.heroContent}>
-                    <h1>Красота-это сила,а макияж-то,что действительно ее подчеркивает.Это женский секрет. (с)</h1>
+                    <h1 className={styles.title}>Красота-это сила,а макияж-то,что действительно ее подчеркивает.Это женский секрет. (с)</h1>
                     <p>Подчеркните свою естественную красоту</p>
                     <a href="/booking" className={styles.booking__button}>Записаться</a>
                 </div>
@@ -93,11 +98,8 @@ const Home = () => {
             </section>
             <section className={styles.myGallery}>
                 <h2>Мои работы</h2>
-
-
             </section >
         </div>
-
     );
 };
 

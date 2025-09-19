@@ -11,6 +11,80 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(255, 245, 245, 0.8) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255, 228, 225, 0.6) 0%, transparent 50%),
+        linear-gradient(135deg, #fff0f5 0%, #ffe4e9 50%, #ffd6e0 100%);
+}
+
+/* Анимированный фон */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30,30 Q50,10 70,30 T90,50 T70,70 T50,90 T30,70 T10,50 T30,30' fill='none' stroke='%23ff85a2' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+    animation: float 20s infinite linear;
+    pointer-events: none;
+}
+
+/* Блестки */
+.sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkle 2s infinite;
+    pointer-events: none;
+}
+
+.sparkle:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.sparkle:nth-child(2) {
+    top: 60%;
+    left: 80%;
+    animation-delay: 0.5s;
+}
+
+.sparkle:nth-child(3) {
+    top: 40%;
+    left: 40%;
+    animation-delay: 1s;
+}
+
+.sparkle:nth-child(4) {
+    top: 80%;
+    left: 30%;
+    animation-delay: 1.5s;
+}
+
+.sparkle:nth-child(5) {
+    top: 30%;
+    left: 70%;
+    animation-delay: 2s;
+}
+
+/* Цветочный декор */
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background-image: var(--flower-pattern);
+    background-size: contain;
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 /*Контейнер слайдера*/
@@ -30,8 +104,9 @@
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: top center;
+    background-position: center 25%;
     background-repeat: no-repeat;
+    background-color: #f8d7da;
     opacity: 0;
     transition: opacity 1s ease-in-out;
     transform: scale(1.1);
@@ -48,19 +123,12 @@
 
 /*Контент поверх*/
 .heroContent {
-    bottom: 40px;
-    transform: translateX(-50%);
-    left: 50%;
-    max-width: 100%;
-    position: absolute;
-    z-index: 3;
+    position: relative;
+    z-index: 2;
     text-align: center;
-    color: white;
+    color: var(--text-color);
+    max-width: 800px;
     padding: 0 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    padding: 2rem;
-    border-radius: 10px;
-    width: 100%;
 }
 
 .heroContent h1 {
@@ -78,25 +146,40 @@
 }
 
 .booking__button {
-    background: linear-gradient(135deg, var(--accent-color), #ff6b9d);
-    color: white;
+    background: linear-gradient(135deg, #ff85a2, #ff6b9d);
+    border: none;
     padding: 15px 40px;
-    border-radius: 30px;
+    border-radius: 50px;
+    color: white;
     font-weight: 600;
-    font-size: 1.1rem;
+    position: relative;
+    overflow: hidden;
     transition: all 0.3s ease;
-    animation: fadeIn 1s ease 0.6s forwards;
-    opacity: 1;
-    display: inline-block;
     text-decoration: none;
-    text-shadow: none;
-    box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+    display: inline-block;
+    margin-top: 2rem;
+    box-shadow: 0 5px 15px rgba(255, 133, 162, 0.3);
+}
+
+.booking__button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+
+.booking__button:hover::before {
+    left: 100%;
 }
 
 .booking__button:hover {
-    background: linear-gradient(135deg, #ff6b9d, #ff4d87);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(255, 133, 162, 0.4);
 }
 
 .sliderNavigation {
@@ -218,4 +301,8 @@
     align-items: center;
     height: 100vh;
     font-size: 1.5rem;
+}
+
+.title {
+    animation: float 3s ease-in-out infinite;
 }

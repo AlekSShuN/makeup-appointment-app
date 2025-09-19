@@ -1,10 +1,10 @@
 .form {
-    background: var(--white);
+    background: rgba(255, 255, 255, 0.25);
     padding: 2.5rem;
     border-radius: 20px;
-    box-shadow:
-        0 4px 20px rgba(255, 133, 162, 0.05);
-    border: 2px solid var(--primary-color);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
 }
 
 .formGroup {
@@ -38,14 +38,17 @@
 .form_group textarea {
     width: 100%;
     padding: 15px;
-    border: 2px solid var(--primary-color);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
     transition: var(--transition);
     border-color: #f8f9fa;
     background-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
 }
+
 
 .input:focus,
 .select:focus,
@@ -53,6 +56,7 @@
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(255, 133, 162, 0.2);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .textarea {

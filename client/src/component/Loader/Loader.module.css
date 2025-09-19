@@ -1,0 +1,40 @@
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    background: conic-gradient(from 0deg, #ff85a2, #ff6b9d, #ff85a2);
+    border-radius: 50%;
+    position: relative;
+    animation: rotate 1s linear infinite;
+}
+
+.loader::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    background: white;
+    border-radius: 50%;
+}
+
+.loaderText {
+    margin-top: 1rem;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
