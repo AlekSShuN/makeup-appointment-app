@@ -238,11 +238,12 @@
     transition: all 0.4s ease;
     text-decoration: none;
     display: inline-block;
-    animation: gradientShift 3s ease infinite;
+    animation:
+        gradientShift 4s ease infinite,
+        buttonPulse 2s ease infinite;
     box-shadow:
         0 10px 30px rgba(255, 107, 157, 0.4),
         0 0 0 1px rgba(255, 255, 255, 0.2);
-
 }
 
 .booking__button::before {
@@ -252,8 +253,11 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.7s ease;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent);
+    animation: shimmer 3s infinite;
 }
 
 
@@ -795,11 +799,11 @@
 
 @keyframes shimmer {
     0% {
-        background-position: -200% 0;
+        left: -100%;
     }
 
     100% {
-        background-position: 200% 0;
+        left: 100%;
     }
 }
 
@@ -824,6 +828,22 @@
 
     100% {
         transform: translateY(0) rotate(0deg);
+    }
+}
+
+@keyframes buttonPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 10px 30px rgba(255, 107, 157, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 10px 40px rgba(255, 107, 157, 0.8),
+            0 0 0 2px rgba(255, 255, 255, 0.4);
     }
 }
 

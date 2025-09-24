@@ -15,13 +15,18 @@ const Booking = () => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                const data = await response.json();
-                setServices(data);
+                const result = await response.json();
+                if (result.success) {
+                    setServices(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load services');
+                }
             } catch (error) {
                 setError(error.message);
+                console.error('Error fetching services:', error);
             } finally {
                 setLoading(false);
-            };
+            }
         };
         fetchServices();
     }, []);
