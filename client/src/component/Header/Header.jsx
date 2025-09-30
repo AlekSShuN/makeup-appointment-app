@@ -1,29 +1,44 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import styles from './Header.module.css';
+import { Link } from 'react-router-dom';
+
 
 const Header = () => {
-    const location = useLocation(); // получаем данные о текущем URL
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const closeMemu = () => {
+        setIsMenuOpen(false);
+    };
 
     return (
         <header className={styles.header}>
-            <nav className={styles.nav}>
-                <Link to="/" className={styles.logo}>
-                    MISS_NADYA MAKEUP
-                </Link>
+            <div className={styles.logo}>
+                <Link to="/" onClick={closeMemu}>MISS_NADYA MAKEUP</Link>
+            </div>
+
+            <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
                 <ul className={styles.navList}>
-                    <li><Link to="/" className={location.pathname === '/' ? styles.active : ''}>Главная</Link></li>
-                    <li><Link to="/services" className={location.pathname === '/services' ? styles.active : ''}>Услуги</Link></li>
-                    <li><Link to="/portfolio" className={location.pathname === '/portolio' ? styles.active : ''}>Портфолио</Link></li>
-                    <li><Link to="/contacts" className={location.pathname === '/contacts' ? styles.active : ''}>Контакты</Link></li>
-                    <li><Link to="/" className={`${styles.bookingLink} ${location.pathname === '/booking' ? styles.active : ''}`}>Запись</Link></li>
+                    <li><Link to="/" className={styles.navLink} onClick={closeMemu}>Главная</Link></li>
+                    <li><Link to="/services" className={styles.navLink} onClick={closeMemu}>Услуги</Link></li>
+                    <li><Link to="/portfolio" className={styles.navLink} onClick={closeMemu}>Портфолио</Link></li>
+                    <li><Link to="/contacts" className={styles.navLink} onClick={closeMemu}>Контакты</Link></li>
                 </ul>
-                <div className={styles.menuToggle}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </nav>
-        </header >
+
+            <Link to="/booking" className={styles.bookingButton} onClick={closeMemu}>Записаться</Link>
+
+            <button className={`${styles.hamburger} ${isMenuOpen ? styles.hamburgerOpen : ''}`}
+                onClick={toggleMenu}
+                aria-label='Открыть меню'>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
     );
 };
 

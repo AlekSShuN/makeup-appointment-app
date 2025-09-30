@@ -1,11 +1,13 @@
 import { RouterProvider } from 'react-router-dom';
 import router from './routes.jsx';
-import './App.css';
-
+import './styles/global.css';
 
 function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <RouterProvider
+            router={router}
+            fallbackElement={<div>Загрузка приложения...</div>} />
+    );
 }
-
 
 export default App;

@@ -6,47 +6,91 @@ const Booking = () => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [retryCount, setRetryCount] = useState(0);
 
-    //получение данных с сервера
+    // Функция загрузки услуг
+    const fetchServices = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            console.log('Fetching services from /api/services');
+            const response = await fetch('/api/services');
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Received data:', result);
+
+            if (result.success) {
+                setServices(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to load services');
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            setError(error.message || 'Произошла ошибка при загрузке услуг');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchServices = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/services');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setServices(data);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            };
-        };
         fetchServices();
-    }, []);
+    }, [retryCount]);
 
-    if (loading) return <div className={styles.loading}>Загрузка услуг</div>;
+    // Функция повторной попытки 
+    const retryFetch = () => {
+        setRetryCount(prev => prev + 1);
+    };
 
-    if (error) return <div className={styles.error}>
-        <h3>Не удалось загрузить услуги</h3>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Попробовать снова</button>
-    </div>;
+    if (loading) {
+        return (
+            <div className={styles.booking}>
+                <div className={styles.container}>
+                    <div className={styles.loading}>
+                        Загрузка услуг...
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-    if (!loading && !error && services.length === 0) {
-        return <div>Нет доступных услуг для записи</div>;
+    if (error) {
+        return (
+            <div className={styles.booking}>
+                <div className={styles.container}>
+                    <div className={styles.error}>
+                        <h2>Ошибка загрузки</h2>
+                        <p>{error}</p>
+                        <button
+                            className={styles.retryButton}
+                            onClick={retryFetch}
+                        >
+                            Попробовать снова
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className={styles.Booking}>
-            <h1 className={styles.title}>Записаться на услугу</h1>
-            <p className={styles.sub_title}>Выберите услугу и время</p>
-            <BookingForm services={services} />
+        <div className={styles.booking}>
+            <div className={styles.container}>
+                <h1 className={styles.title}>Запись на услугу</h1>
+                <p className={styles.sub_title}>
+                    Выберите услугу и удобное время для визита.
+                    Мы свяжемся с вами для подтверждения записи.
+                </p>
+                <BookingForm services={services} />
+            </div>
         </div>
     );
 };
-
-
 
 export default Booking;

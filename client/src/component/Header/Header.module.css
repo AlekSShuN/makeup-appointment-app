@@ -1,107 +1,244 @@
 .header {
-    background-color: var(--white);
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-}
-
-.nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 1rem 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .logo {
+    position: relative;
+    z-index: 1001;
+    font-weight: 700;
     font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    font-family: serif;
+    color: #2c3e50;
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ff6b9d;
+    filter: saturate(1.3) brightness(1.1);
+    text-shadow: 0 0 15px rgba(12, 0, 0, 0.4);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    z-index: 1001;
 }
 
 .navList {
+    list-style: none;
     display: flex;
     gap: 2rem;
+    margin: 0;
+    padding: 0;
 }
 
-.navList a {
-    position: relative;
-    padding: 0.5rem 0;
+.navLink {
+    text-decoration: none;
+    color: var(--text-color);
     font-weight: 500;
-    color: -webkit-link;
-    cursor: pointer;
-    text-decoration: underline;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    font-size: large;
 }
 
-.navList a:after {
+.navLink::before {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -5px;
     left: 0;
     width: 0;
     height: 2px;
-    background-color: var(--primary-color);
-    transition: var(--transition);
+    background: var(--primary-color);
+    transition: width 0.3s ease;
 }
 
-.navList a:hover::after,
-.navList a.active::after {
+.navLink:hover {
+    color: var(--primary-color);
+}
+
+.navLink:hover::before {
     width: 100%;
 }
 
-.bookingLink {
-    background-color: var(--primary-color);
-    color: var(--white);
-    padding: 0.5rem 1.5rem;
-    border-radius: 25px;
+.bookingButton {
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2, #ff9dae);
+    background-size: 200% 200%;
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
     font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    position: relative;
+    overflow: hidden;
+    animation:
+        gradientShift 4s ease infinite,
+        buttonPulse 2s ease infinite;
+    box-shadow:
+        0 4px 15px rgba(255, 107, 157, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    font-family: sans-serif;
 }
 
-.bookingLink:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(2px);
+
+.bookingButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 3s infinite;
 }
 
-.bookingLink::after {
-    display: none;
+.bookingButton:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(255, 107, 157, 0.7),
+        0 0 0 2px rgba(255, 255, 255, 0.4);
 }
 
-.menuToggle {
+/* Гамбургер-кнопка (скрыта на десктопе) */
+.hamburger {
     display: none;
     flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: none;
+    border: none;
     cursor: pointer;
+    padding: 0;
+    z-index: 1001;
 }
 
-.menuToggle span {
-    width: 25px;
-    height: 2px;
-    border-color: var(--text-color);
-    margin: 3px 0;
-    transition: var(--transition);
+.hamburger span {
+    height: 3px;
+    width: 100%;
+    background-color: var(--text-color);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    transform-origin: center;
 }
 
+/* Анимация гамбургера при открытии */
+.hamburgerOpen span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburgerOpen span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburgerOpen span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
-    .menuToggle {
+    .header {
+        padding: 1rem;
+    }
+
+    .nav,
+    .bookingButton {
+        display: none;
+    }
+
+    .hamburger {
         display: flex;
     }
 
-    .navList {
+    /* Стили для открытого меню на мобильных */
+    .navOpen {
+        display: flex;
         position: fixed;
-        top: 70px;
-        left: -100%;
-        font-display: column;
-        background-color: var(--white);
+        top: 0;
+        left: 0;
         width: 100%;
-        height: calc(100vh - 70px);
-        padding: 2rem;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        gap: 1.5rem;
+        height: 100vh;
+        background-color: rgba(255, 255, 255, 0.98);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
     }
 
-    .navList:active {
-        left: 0;
+    .navOpen .navList {
+        flex-direction: column;
+        gap: 2.5rem;
+        text-align: center;
+    }
+
+    .navOpen .navLink {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .navOpen~.bookingButton {
+        display: block;
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+
+/*Cтили для очень маленьких экранов */
+@media (max-width: 480px) {
+    .logo a {
+        font-size: 1.2rem;
+    }
+
+    .navOpen .navList {
+        gap: 2rem;
+    }
+
+    .navOpen .navLink {
+        font-size: 1.1rem;
+    }
+}
+
+@keyframes buttonPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 4px 15px rgba(255, 107, 157, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 4px 20px rgba(255, 107, 157, 0.8),
+            0 0 0 2px rgba(255, 255, 255, 0.4);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
     }
 }

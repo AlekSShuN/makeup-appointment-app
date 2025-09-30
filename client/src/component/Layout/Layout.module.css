@@ -2,9 +2,109 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .main {
     flex: 1;
-    padding: 2rem;
+    width: 100%;
+    position: relative;
+}
+
+.main:not(.noPadding) {
+    padding: 1rem;
+}
+
+.homePage .main {
+    padding: 0;
+}
+
+.bookingPage .main {
+    padding: 1rem;
+}
+
+.servicesPage .main,
+.portfolioPage .main,
+.contactsPage .main {
+    padding: 1.5rem;
+}
+
+.main> :global(.container) {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+    .main:not(.noPadding) {
+        padding: 1.5rem;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .layout {
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+
+    .main:not(.noPadding) {
+        padding: 1rem;
+    }
+
+    .servicesPage .main,
+    .portfolioPage .main,
+    .contactsPage .main {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main:not(.noPadding) {
+        padding: 0.75rem;
+    }
+
+    .loaderWrapper {
+        min-height: 40vh;
+        padding: 1.5rem;
+    }
+}
+
+/* Поддержка landscape на мобильных */
+@media (max-height: 500px) and (orientation: landscape) {
+    .layout {
+        min-height: auto;
+    }
+
+    .main {
+        padding: 0.5rem !important;
+    }
+}
+
+.main:focus {
+    outline: 2px solid #ff6b9d;
+    outline-offset: -2px;
+}
+
+/* Темная тема поддержка */
+@media (prefers-color-scheme: dark) {
+    .layout {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+}
+
+.main>* {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

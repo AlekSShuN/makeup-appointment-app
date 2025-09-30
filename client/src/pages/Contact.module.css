@@ -1,71 +1,746 @@
 .contacts {
-    padding: 60px 0;
+    padding: 50px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
 }
 
-.contactGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
-    margin-top: 3rem;
+.contacts::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 133, 162, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 157, 0.15) 0%, transparent 40%);
+    pointer-events: none;
 }
 
-.contactInfo {
+.contacts.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Фон */
+.contacts::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 133, 162, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 157, 0.15) 0%, transparent 40%);
+    pointer-events: none;
+}
+
+.mapFallback {
+    height: 100%;
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
 }
 
-.contactItem {
+.fallbackIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.mapFallback p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.mapFallback span {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/*Подсказки для телефона*/
+.phoneHint {
+    font-size: 0.8rem !important;
+    color: #888 !important;
+    margin-top: 0.3rem !important;
+    font-style: italic;
+}
+
+/* Частицы */
+.floatingParticles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.floatingParticle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #ff85a2;
+    border-radius: 50%;
+    animation: floatParticle 20s infinite linear;
+    opacity: 0.3;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+}
+
+.visible .header {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b9d, #ff85a2);
+    margin: 20px auto 0;
+    border-radius: 2px;
+}
+
+.subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.4;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.statusIndicator {
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: clamp(0.8rem, 1.8vw, 1rem);
+    white-space: nowrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.statusIndicator.open {
+    background: #d4edda;
+    color: #155724;
+}
+
+.statusIndicator.closed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.currentTime {
+    color: #5a5a5a;
+    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 50px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.infoCard {
     display: flex;
     align-items: flex-start;
-    gap: 15px;
+    gap: 1.2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.contactIcon {
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    min-width: 24px;
+.visible .infoCard:nth-child(1) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.3s;
 }
 
-.contactForm {
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+.visible .infoCard:nth-child(2) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.4s;
 }
+
+.visible .infoCard:nth-child(3) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.5s;
+}
+
+.infoCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.infoCard .icon {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    min-width: 50px;
+    color: #ff6b9d;
+    flex-shrink: 0;
+}
+
+.infoContent {
+    flex: 1;
+}
+
+.infoCard h3 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.infoCard p,
+.infoCard a {
+    margin: 0.2rem 0;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: #5a5a5a;
+    line-height: 1.4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.phoneLink {
+    color: #ff6b9d;
+    font-weight: 600;
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem) !important;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.phoneLink:hover {
+    color: #ff85a2;
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+.link {
+    color: #ff6b9d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.socialSection {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.socialSection h3 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.socialSection p {
+    color: #666;
+    margin-bottom: 1.2rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.statusIndicator {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.statusIndicator:hover {
+    transform: scale(1.05);
+}
+
+.statusIndicator.open {
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.infoCard:hover .icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
 
 .socialLinks {
-    display: flex;
-    gap: 15px;
-    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
 }
 
 .socialLink {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border-radius: 50%;
-    transition: var(--transition);
+    gap: 0.75rem;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    text-decoration: none;
+    color: #5a5a5a;
+    transition: transform 0.2s ease, color 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .socialLink:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: #007bff
 }
 
-.map {
-    height: 300px;
-    border-radius: 8px;
+.socialLink img {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.socialLink:hover img {
+    transform: scale(1.1);
+}
+
+.mapSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mapContainer {
+    border-radius: 12px;
     overflow: hidden;
-    margin-top: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    position: relative;
+    height: 350px;
 }
 
-.map iframe {
+.mapPlaceholder {
+    height: 100%;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff85a2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mapOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    width: 90%;
+    max-width: 300px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mapOverlay:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.mapHint {
+    text-align: center;
+    color: #666;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    margin-top: 0.5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.featureIcon {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: #ff6b9d;
+    flex-shrink: 0;
+}
+
+.ctaSection {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease 0.7s, transform 0.5s ease 0.7s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.visible .ctaSection {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.ctaSection h3 {
+    font-size: clamp(1.8rem, 4vw, 2.2rem);
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #2c3e50 0%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ctaSection p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    line-height: 1.4;
+}
+
+.bookingButton {
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2, #ff9dae);
+    background-size: 200% 200%;
+    border: none;
+    padding: 18px 50px;
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    text-decoration: none;
+    display: inline-block;
+    animation:
+        gradientShift 4s ease infinite,
+        buttonPulse 2s ease infinite;
+    box-shadow:
+        0 10px 30px rgba(255, 107, 157, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.bookingButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    border: none;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent);
+    animation: shimmer 3s infinite;
+}
+
+.bookingButton:hover::before {
+    left: 100%;
+}
+
+.bookingButton:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow:
+        0 20px 40px rgba(255, 107, 157, 0.6),
+        0 0 0 2px rgba(255, 255, 255, 0.3);
+    animation: gradientShift 1.5s ease infinite;
+}
+
+.bookingButton:focus,
+.socialLink:focus,
+.phoneLink:focus {
+    outline: 3px solid #ff6b9d;
+    outline-offset: 2px;
+}
+
+.mapLink:focus {
+    outline: 3px solid #ff6b9d;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Анимации */
+@keyframes floatParticle {
+
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(-100vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes buttonPulse {
+    0% {
+        box-shadow:
+            0 10px 30px rgba(255, 107, 157, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 10px 40px rgba(255, 107, 157, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.3);
+    }
+
+    100% {
+        box-shadow:
+            0 10px 30px rgba(255, 107, 157, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contacts {
+        padding: 60px 0;
+    }
+
+    .header {
+        margin-bottom: 40px;
+    }
+
+    .status {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+
+    .socialLinks {
+        grid-template-columns: 1fr;
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+    }
+
+    .infoCard {
+        padding: 1.2rem;
+    }
+
+    .ctaSection {
+        padding: 2rem 1rem;
+    }
+
+    .mapContainer {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .staticMap {
+        min-height: 200px;
+        object-fit: cover;
+    }
+}
+
+@media (max-width: 480px) {
+    .contacts {
+        padding: 40px 0;
+    }
+
+    .header {
+        margin-bottom: 30px;
+    }
+
+    .infoCard {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.8rem;
+    }
+
+    .infoCard .icon {
+        min-width: auto;
+    }
+
+    .socialSection {
+        padding: 1rem;
+    }
+
+    .mapContainer {
+        height: 250px;
+    }
+
+    .bookingButton {
+        min-width: 150px;
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    .infoCard {
+        padding: 1rem;
+    }
+
+    .socialLink {
+        padding: 0.6rem;
+    }
+
+    .feature {
+        padding: 0.8rem;
+    }
 }
