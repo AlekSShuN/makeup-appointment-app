@@ -1,55 +1,327 @@
 .services {
-    padding: 60px 0;
-}
-
-.servicesGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-top: 3rem;
-}
-
-.serviceCard {
-    background-color: var(--white);
-    border-radius: 8px;
+    padding: 50px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    position: relative;
+    min-height: 100vh;
     overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    opacity: 1;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
 }
 
-.serviceCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.services::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 133, 162, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 157, 0.15) 0%, transparent 40%);
+    pointer-events: none;
 }
 
-.serviceImage {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+.services.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.serviceContent {
-    padding: 1.5rem;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.serviceContent h3 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+.header {
+    text-align: center;
+    margin-bottom: 60px;
 }
 
-.serviceContent p {
-    color: var(--text-light);
-    margin-bottom: 1rem;
+.section_title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    text-align: center;
+    position: relative;
 }
 
-.servicePrice {
-    font-weight: bold;
-    color: var(--primary-color);
+.section_title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b9d, #ff85a2);
+    margin: 20px auto 0;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.section_title:hover::after {
+    width: 120px;
+}
+
+.subtitle {
     font-size: 1.2rem;
-    margin: 1rem 0;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.serviceDuration {
-    color: var(--text-light);
+.pricingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.pricingCard {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    position: relative;
+    border: 1px solid #f1f5f9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.pricingCard:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.pricingCard:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.pricingCard:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.pricingCard:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.pricingCard:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.pricingCard:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+.pricingCard:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+.pricingCard:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+.pricingCard:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+.pricingCard:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.pricingCard.popular {
+    border: 2px solid #ff6b9d;
+    transform: scale(1.05);
+}
+
+.pricingCard.popular:hover {
+    transform: scale(1.05) translateY(-10px);
+}
+
+.popularBadge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2);
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cardHeader {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 25px;
+}
+
+.serviceTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ff6b9d;
+    margin-bottom: 5px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.duration {
     font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.description {
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.checkIcon {
+    background: #10b981;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.orderButton {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.orderButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 107, 157, 0.3);
+}
+
+.orderButton:focus {
+    outline: 3px solid #ff6b9d;
+    outline-offset: 2px;
+}
+
+.pricingCard:focus-within {
+    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.3);
+}
+
+.orderButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .services {
+        padding: 50px 0;
+    }
+
+    .pricingGrid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pricingCard.popular {
+        transform: none;
+    }
+
+    .pricingCard.popular:hover {
+        transform: translateY(-10px);
+    }
+
+    .pricingCard {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pricingGrid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .pricingCard {
+        padding: 25px 15px;
+    }
+
+    .serviceTitle {
+        font-size: 1.3rem;
+    }
+
+    .price {
+        font-size: 1.7rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pricingCard {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .pricingCard:hover {
+        transform: none;
+    }
+
+    .orderButton:hover {
+        transform: none;
+    }
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

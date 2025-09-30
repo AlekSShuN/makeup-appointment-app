@@ -6,36 +6,55 @@ const Booking = () => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [retryCount, setRetryCount] = useState(0);
 
-    //получение данных с сервера
-    useEffect(() => {
-        const fetchServices = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/services');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const result = await response.json();
-                if (result.success) {
-                    setServices(result.data);
-                } else {
-                    throw new Error(result.message || 'Failed to load services');
-                }
-            } catch (error) {
-                setError(error.message);
-                console.error('Error fetching services:', error);
-            } finally {
-                setLoading(false);
+    // Функция загрузки услуг
+    const fetchServices = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            console.log('Fetching services from /api/services');
+            const response = await fetch('/api/services');
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
+
+            const result = await response.json();
+            console.log('Received data:', result);
+
+            if (result.success) {
+                setServices(result.data);
+            } else {
+                throw new Error(result.message || 'Failed to load services');
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            setError(error.message || 'Произошла ошибка при загрузке услуг');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchServices();
-    }, []);
+    }, [retryCount]);
+
+    // Функция повторной попытки 
+    const retryFetch = () => {
+        setRetryCount(prev => prev + 1);
+    };
 
     if (loading) {
         return (
             <div className={styles.booking}>
                 <div className={styles.container}>
-                    <div className={styles.loading}>Загрузка услуг</div>
+                    <div className={styles.loading}>
+                        Загрузка услуг...
+                    </div>
                 </div>
             </div>
         );
@@ -46,7 +65,14 @@ const Booking = () => {
             <div className={styles.booking}>
                 <div className={styles.container}>
                     <div className={styles.error}>
-                        Ошибка: {error}
+                        <h2>Ошибка загрузки</h2>
+                        <p>{error}</p>
+                        <button
+                            className={styles.retryButton}
+                            onClick={retryFetch}
+                        >
+                            Попробовать снова
+                        </button>
                     </div>
                 </div>
             </div>
@@ -58,15 +84,13 @@ const Booking = () => {
             <div className={styles.container}>
                 <h1 className={styles.title}>Запись на услугу</h1>
                 <p className={styles.sub_title}>
-                    Выберите услугу и удобное время для визита. Мы свяжемся с вами для подтверждения записи.
+                    Выберите услугу и удобное время для визита.
+                    Мы свяжемся с вами для подтверждения записи.
                 </p>
                 <BookingForm services={services} />
             </div>
         </div>
     );
 };
-
-
-
 
 export default Booking;

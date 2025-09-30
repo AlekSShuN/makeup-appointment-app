@@ -1,25 +1,73 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Layout from "./component/Layout/Layout.jsx";
-import Home from './pages/Home.jsx';
-import Services from './pages/Services.jsx';
-import Portfolio from './pages/Portfolio.jsx';
-import Contacts from './pages/Contacts.jsx';
-import Booking from './pages/Booking.jsx';
 
 
+const Home = lazy(() => import('./pages/Home.jsx'));
+const Services = lazy(() => import('./pages/Services.jsx'));
+const Portfolio = lazy(() => import('./pages/Portfolio.jsx'));
+const Contacts = lazy(() => import('./pages/Contacts.jsx'));
+const Booking = lazy(() => import('./pages/Booking.jsx'));
 
+const LoadingSpinner = () => (
+    <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '200px'
+    }}>
+        <div>Загрузка страницы...</div>
+    </div>
+);
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <Layout />,
+        element: (
+            <Suspense fallback={<LoadingSpinner />}>
+                <Layout />
+            </Suspense>
+        ),
         children: [
-            { path: '', element: <Home /> },
-            { path: 'services', element: <Services /> },
-            { path: 'portfolio', element: <Portfolio /> },
-            { path: 'contacts', element: <Contacts /> },
             {
-                path: 'booking', element: <Booking />,
+                index: true,
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Home />
+                    </Suspense>
+                )
+            },
+            {
+                path: 'services',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Services />
+                    </Suspense>
+                )
+            },
+            {
+                path: 'portfolio',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Portfolio />
+                    </Suspense>
+                )
+            },
+            {
+                path: 'contacts',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Contacts />
+                    </Suspense>
+                )
+            },
+            {
+                path: 'booking',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Booking />
+                    </Suspense>
+                )
             },
         ],
     },

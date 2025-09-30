@@ -2,6 +2,14 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import styles from './Home.module.css';
 import Header from '../component/Header/Header.jsx';
 
+const SLIDE_INTERVAL = 4000;
+const PARTICLE_COUNT = 15;
+const PARTICLE_CONFIG = {
+    minSize: 4,
+    maxSize: 12,
+    minDuration: 15,
+    maxDuration: 25
+};
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -10,22 +18,22 @@ const Home = () => {
     const observerRef = useRef(null);
 
     const slides = [
-        { image: "/slider/slider1.jpg", alt: "Вечерний макияж" },
-        { image: "/slider/slider2.jpg", alt: "Свадебный макияж" },
-        { image: "/slider/slider3.jpg", alt: "Дневной макияж" },
-        { image: "/slider/slider4.jpg", alt: "Smoky eyes" },
-        { image: "/slider/slider5.jpg", alt: "Натуральный макияж" }
+        { image: "/slider/slider6.PNG", alt: "Вечерний макияж" },/*
+        { image: "/slider/slider2.JPG", alt: "Свадебный макияж" },
+        { image: "/slider/slider3.JPG", alt: "Дневной макияж" },
+        { image: "/slider/slider1.JPG", alt: "Smoky eyes" },
+        { image: "/slider/slider2.JPG", alt: "Натуральный макияж" }*/
     ];
 
     const createParticles = useCallback(() => {
         const particles = [];
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
             particles.push({
                 id: i,
-                size: Math.random() * 8 + 4,
+                size: Math.random() * (PARTICLE_CONFIG.maxSize - PARTICLE_CONFIG.minSize) + PARTICLE_CONFIG.minSize,
                 left: Math.random() * 100,
                 delay: Math.random() * 15,
-                duration: Math.random() * 10 + 15
+                duration: Math.random() * (PARTICLE_CONFIG.maxDuration - PARTICLE_CONFIG.minDuration) + PARTICLE_CONFIG.minDuration
             });
         }
         return particles;
@@ -33,7 +41,6 @@ const Home = () => {
 
     const particles = createParticles();
 
-    // Предзагрузка изображений
     const preloadImages = useCallback(async () => {
         const promises = slides.map(slide => {
             return new Promise((resolve) => {
@@ -53,7 +60,7 @@ const Home = () => {
 
         const slideTimer = setInterval(() => {
             setCurrentSlide(prev => (prev === slides.length - 1 ? 0 : prev + 1));
-        }, 4000);
+        }, SLIDE_INTERVAL);
 
         return () => {
             clearInterval(slideTimer);
@@ -88,7 +95,6 @@ const Home = () => {
         };
     }, [isLoading]);
 
-    // Функция для добавления ref'ов
     const addSectionRef = useCallback((el, index) => {
         sectionRefs.current[index] = el;
     }, []);
@@ -119,120 +125,136 @@ const Home = () => {
                 />
             ))}
 
-            <section className={styles.hero}>
-                <div className={styles.sparkle}></div>
-                <div className={styles.sparkle}></div>
-                <div className={styles.sparkle}></div>
-                <div className={styles.sparkle}></div>
-                <div className={styles.sparkle}></div>
+            <section
+                ref={(el) => addSectionRef(el, 0)} className={styles.hero}>
+                <div className={styles.heroBackground}>
+                    <img
+                        src={slides[currentSlide].image}
+                        alt={slides[currentSlide].alt}
+                        className={styles.heroImage}
+                    />
+                    <div className={styles.heroOverlay}></div>
+                </div>
 
-                <div className={styles.heroContainer}>
-                    <div className={styles.heroContent}>
-                        <h1 className={styles.title}>Профессиональный визажист Надежда</h1>
-                        <p className={styles.tagline}>Подчеркните свою естественную красоту</p>
-                        <p className={styles.quote}>"Красота-это сила, а макияж-то, что действительно подчеркивает."</p>
-                        <a href="/booking" className={styles.booking__button}>
-                            Записаться на образ
-                        </a>
-                    </div>
-
-                    <div className={styles.heroSliderSection}>
-                        <div className={styles.sliderContainer}>
-                            <div className={styles.heroSlider}>
-                                {slides.map((slide, index) => (
-                                    <div
-                                        key={index}
-                                        className={`${styles.slide} ${index === currentSlide ? styles.activ : ''}`}
-                                    >
-                                        <img src={slide.image}
-                                            alt={slide.alt}
-                                            className={styles.slideImage}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className={styles.sliderNavigation}>
-                            {slides.map((_, index) => (
-                                <button
-                                    key={index}
-                                    className={`${styles.sliderDot} ${index === currentSlide ? styles.activ : ''}`}
-                                    onClick={() => setCurrentSlide(index)}
-                                />
-                            ))}
-
+                <div className={styles.heroContent}>
+                    <div className={styles.heroText}>
+                        <h1 className={styles.heroTitle}>
+                            Профессиональный визажист
+                        </h1>
+                        <p className={styles.heroSubtitle}>
+                            Создаю идеальные образы, которые подчеркивают вашу естественную красоту
+                        </p>
+                        <div className={styles.heroButtons}>
+                            <a href="/services" className={styles.heroButtonPrimary}>
+                                Записаться
+                            </a>
+                            <a href="/portfolio" className={styles.heroButtonSecondary}>
+                                Портфолио
+                            </a>
                         </div>
                     </div>
                 </div>
+
+                <div className={styles.heroSliderDots}>
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            className={`${styles.sliderDot} ${index === currentSlide ? styles.active : ''}`}
+                            onClick={() => setCurrentSlide(index)}
+                        />
+                    ))}
+                </div>
             </section>
 
+
+
             <section
-                ref={(el) => addSectionRef(el, 0)}
-                className={styles.featuredServices}
-            >
+                ref={(el) => addSectionRef(el, 1)} className={styles.featuredServices}>
                 <div className={styles.container}>
                     <h2 className={styles.section_title}>Популярные услуги</h2>
                     <div className={styles.servicesGrid}>
                         <a href="/services#wedding" className={styles.serviceCard}>
-                            <h3>💒 Свадебный макияж</h3>
-                            <p>от 5 000 ₽</p>
-                            <span className={styles.serviceDesc}>Идеальный образ для самого важного дня</span>
+                            <div className={styles.imageContainer}>
+                                <img
+                                    src="/images/services/wedding-makeup.JPG"
+                                    alt="Свадебный макияж"
+                                    className={styles.serviceImage}
+                                />
+                            </div>
+                            <div className={styles.serviceContent}>
+                                <h3 className={styles.serviceTitle}> Свадебный образ</h3>
+                                <p className={styles.price}>6 000 ₽</p>
+                                <span className={styles.serviceDesc}>Идеальный образ для самого важного дня</span>
+                            </div>
                         </a>
+
                         <a href="/services#evening" className={styles.serviceCard}>
-                            <h3>🌙 Вечерний макияж</h3>
-                            <p>от 3 500 ₽</p>
-                            <span className={styles.serviceDesc}>Для особых мероприятий и выходов</span>
+                            <div className={styles.imageContainer}>
+                                <img
+                                    src="/images/services/evening-makeup.JPG"
+                                    alt="Вечерний макияж"
+                                    className={styles.serviceImage}
+                                />
+                            </div>
+                            <div className={styles.serviceContent}>
+                                <h3 className={styles.serviceTitle}> Вечерний макияж</h3>
+                                <p className={styles.price}>2 300 ₽</p>
+                                <span className={styles.serviceDesc}>Для особых мероприятий и выходов</span>
+                            </div>
                         </a>
+
                         <a href="/services#lesson" className={styles.serviceCard}>
-                            <h3>🎓 Уроки макияжа</h3>
-                            <p>от 4 000 ₽</p>
-                            <span className={styles.serviceDesc}>Научимся создавать идеальный образ</span>
+                            <div className={styles.imageContainer}>
+                                <img
+                                    src="/images/services/makeup-lesson.JPG"
+                                    alt="Уроки макияжа"
+                                    className={styles.serviceImage}
+                                />
+                            </div>
+                            <div className={styles.serviceContent}>
+                                <h3 className={styles.serviceTitle}> Урок макияжа для себя</h3>
+                                <p className={styles.price}>4 500 ₽</p>
+                                <span className={styles.serviceDesc}>Научимся создавать идеальный образ</span>
+                            </div>
                         </a>
                     </div>
                 </div>
             </section>
 
-            <section
-                ref={(el) => addSectionRef(el, 1)}
-                className={styles.about}
-            >
+            <section ref={(el) => addSectionRef(el, 2)} className={styles.about}>
                 <div className={styles.container}>
                     <div className={styles.aboutContent}>
                         <div className={styles.aboutImage}>
-                            <img src="/about-me.jpg" alt="Визажист Надежда" />
+                            <img src="/images/services/miss_nadya.JPG" alt="Визажист Надежда" />
                         </div>
                         <div className={styles.aboutText}>
                             <h2 className={styles.section_title}>Обо мне</h2>
-                            <h3>Ваш стилист Надежда</h3>
-                            <p>В сфере красоты с 2020 года. Я убеждена, что макияж — это инструмент, который подчеркивает вашу уникальность, а не скрывает ее.</p>
-                            <p>Каждый год я прохожу повышение квалификации и изучаю новые техники, чтобы предлагать вам самые актуальные и современные решения.</p>
+                            <h3 className={styles.aboutSubtitle}>Ваш стилист Надежда</h3>
+                            <p className={styles.aboutParagraph}>В сфере красоты с 2020 года. Я убеждена, что макияж — это инструмент, который подчеркивает вашу уникальность, а не скрывает ее.</p>
+                            <p className={styles.aboutParagraph}>Каждый год я прохожу повышение квалификации и изучаю новые техники, чтобы предлагать вам самые актуальные и современные решения.</p>
                             <ul className={styles.achivmentsList}>
-                                <li>✅ Сертифицированный специалист по технике air-makeup</li>
-                                <li>✅ Опыт работы на съемках для журналов</li>
-                                <li>✅ Более 200 довольных клиентов</li>
+                                <li className={styles.achivmentItem}> Сертифицированный специалист по технике air-makeup</li>
+                                <li className={styles.achivmentItem}> Опыт работы на съемках для журналов</li>
+                                <li className={styles.achivmentItem}> Более 300 довольных клиентов</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section
-                ref={(el) => addSectionRef(el, 2)}
-                className={styles.testimonials}
-            >
+            <section ref={(el) => addSectionRef(el, 3)} className={styles.testimonials}>
                 <div className={styles.container}>
                     <h2 className={styles.section_title}>Отзывы клиентов</h2>
                     <div className={styles.testimonialsGrid}>
                         <div className={styles.testimonialCard}>
                             <div className={styles.quoteIcon}>❝</div>
-                            <p>"Надежда сделала мой свадебный макияж. Я выглядела идеально и чувствовала себя уверенно весь день!"</p>
-                            <span>- Анастасия</span>
+                            <p className={styles.testimonialText}>"Надежда сделала мой свадебный макияж. Я выглядела идеально и чувствовала себя уверенно весь день!"</p>
+                            <span className={styles.testimonialAuthor}>- Анастасия</span>
                         </div>
                         <div className={styles.testimonialCard}>
                             <div className={styles.quoteIcon}>❝</div>
-                            <p>"Профессионал высшего класса! Уроки макияжа изменили мое отношение к косметике."</p>
-                            <span>- Екатерина</span>
+                            <p className={styles.testimonialText}>"Профессионал высшего класса! Уроки макияжа изменили мое отношение к косметике."</p>
+                            <span className={styles.testimonialAuthor}>- Екатерина</span>
                         </div>
                     </div>
                 </div>

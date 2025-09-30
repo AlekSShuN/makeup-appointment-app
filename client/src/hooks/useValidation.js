@@ -1,37 +1,80 @@
 import { useCallback, useRef, useState } from 'react';
 
+const VALIDATION_RULES = {
+    name: {
+        minLength: 2,
+        maxLength: 50,
+        pattern: /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/
+    },
+    phone: {
+        minLength: 11,
+        pattern: /^\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}$/
+    },
+};
+
+const ERROR_MESSAGES = {
+    REQUIRED: 'Это поле обязательно для заполнения',
+    INVALID_DATE: 'Дата не может быть в прошлом',
+    NAME_TOO_SHORT: 'Имя должно содержать минимум 2 символа',
+    NAME_TOO_LONG: 'Имя не должно превышать 50 символов',
+    NAME_INVALID: 'Имя может содержать только буквы, пробелы и дефисы',
+    PHONE_INVALID: 'Введите корректный номер телефона',
+};
+
 export const useValidation = () => {
     const [errors, setErrors] = useState({});
-    const validationTimeout = useRef(null);
+    const validationTimeoutRef = useRef(null);
 
     const validateField = useCallback((name, value) => {
         let error = '';
 
         switch (name) {
             case 'serviceId':
-                if (!value) error = 'Выберите услугу';
+                if (!value) error = ERROR_MESSAGES.REQUIRED;
                 break;
+
             case 'date':
-                if (!value) error = 'Выберите дату';
-                else if (new Date(value) < new Date().setHours(0, 0, 0, 0)) {
-                    error = 'Дата не может быть в прошлом';
+                if (!value) {
+                    error = ERROR_MESSAGES.REQUIRED;
+                } else {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < today) {
+                        error = ERROR_MESSAGES.INVALID_DATE;
+                    }
                 }
                 break;
+
             case 'time':
-                if (!value) error = 'Выберите время';
+                if (!value) error = ERROR_MESSAGES.REQUIRED;
                 break;
+
             case 'name':
-                if (!value.trim()) error = 'Введите имя';
-                else if (value.length < 2) error = 'Имя слишком короткое';
+                if (!value.trim()) {
+                    error = ERROR_MESSAGES.REQUIRED;
+                } else if (value.length < VALIDATION_RULES.name.minLength) {
+                    error = ERROR_MESSAGES.NAME_TOO_SHORT;
+                } else if (value.length > VALIDATION_RULES.name.maxLength) {
+                    error = ERROR_MESSAGES.NAME_TOO_LONG;
+                } else if (!VALIDATION_RULES.name.pattern.test(value.trim())) {
+                    error = ERROR_MESSAGES.NAME_INVALID;
+                }
                 break;
+
             case 'phone':
                 const phoneNumbers = value.replace(/\D/g, '');
-                if (phoneNumbers.length < 11) error = 'Введите корректный телефон';
-                break;
-            case 'email':
-                if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                    error = 'Введите корректный email';
+                if (!phoneNumbers) {
+                    error = ERROR_MESSAGES.REQUIRED;
+                } else if (phoneNumbers.length < VALIDATION_RULES.phone.minLength) {
+                    error = ERROR_MESSAGES.PHONE_INVALID;
+                } else if (!/^7\d{10}$/.test(phoneNumbers)) {
+                    error = ERROR_MESSAGES.PHONE_INVALID;
                 }
+                break;
+
+            default:
                 break;
         }
 
@@ -57,6 +100,27 @@ export const useValidation = () => {
         return Object.values(newErrors).every(error => !error);
     }, [validateField]);
 
+    const validateFieldWithDebounce = useCallback((name, value, delay = 500) => {
+        if (validationTimeoutRef.current) {
+            clearTimeout(validationTimeoutRef.current);
+        }
+        validationTimeoutRef.current = setTimeout(() => {
+            const error = validateField(name, value);
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }, delay);
+    }, [validateField]);
+
+    const validateFields = useCallback((fields) => {
+        const newErrors = {};
+
+        Object.entries(fields).forEach(([name, value]) => {
+            newErrors[name] = validateField(name, value);
+        });
+
+        setErrors(prev => ({ ...prev, ...newErrors }));
+        return Object.values(newErrors).every(error => !error);
+    }, [validateField]);
+
     const clearError = useCallback((fieldName) => {
         setErrors(prev => ({ ...prev, [fieldName]: '' }));
     }, []);
@@ -65,10 +129,24 @@ export const useValidation = () => {
         setErrors({});
     }, []);
 
+    // Получение общего статуса валидности формы
+    const isValid = Object.values(errors).every(error => !error);
+
+    const cleanup = useCallback(() => {
+        if (validationTimeoutRef.current) {
+            clearTimeout(validationTimeoutRef.current);
+        }
+    }, []);
+
+
     return {
         errors,
+        isValid,
         validateForm,
+        validateField: validateFieldWithDebounce,
+        validateFields,
         clearError,
-        clearAllErrors
+        clearAllErrors,
+        cleanup
     };
 };
