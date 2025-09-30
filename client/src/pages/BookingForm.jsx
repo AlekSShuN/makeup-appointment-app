@@ -210,7 +210,8 @@ const BookingForm = ({ services }) => {
     };
 
     const isFormValid = selectedService && selectedDate && selectedTime &&
-        clientData.name && clientData.phone;
+        clientData.name?.trim() &&
+        clientData.phone?.replace(/\D/g, '').length >= 11;
 
     return (
         <form onSubmit={formSubmissionHandler} className={styles.form} noValidate>
@@ -246,7 +247,7 @@ const BookingForm = ({ services }) => {
                     minDate={new Date().toISOString().split('T')[0]}
                     className={styles.calendar}
                     error={errors.date}
-                    disabledDays={[0]}
+                    disabledDays={[]}
                 />
                 {errors.date && (
                     <span className={styles.errorText}>{errors.date}</span>
@@ -325,7 +326,7 @@ const BookingForm = ({ services }) => {
             <button
                 className={styles.submit_button}
                 type="submit"
-                disabled={isSubmitting || !isFormValid}
+                disabled={isSubmitting}
             >
                 {isSubmitting ? (
                     <>
