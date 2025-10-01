@@ -1,33 +1,13 @@
 import express from 'express';
 const router = express.Router();
-import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
+import db from '../db.js';
 
-// Правильное определение путей для ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const bookingsPath = path.join(__dirname, '..', 'data', 'bookings.json');
-
-// Создаем файл если его нет
-const ensureBookingsFile = async () => {
-    try {
-        await fs.access(bookingsPath);
-    } catch (error) {
-        // Файла нет - создаем
-        await fs.writeFile(bookingsPath, JSON.stringify([]));
-        console.log('Created bookings.json file');
-    }
-};
-
-// Роут для получения доступных слотов
+// Роут для получения доступных слотов времени
 router.get('/booking-slots', async (req, res) => {
     try {
-        await ensureBookingsFile();
-
         const { date, serviceId } = req.query;
 
-        console.log('Getting slots for:', { date, serviceId });
+        console.log('📅 Getting slots for:', { date, serviceId });
 
         if (!date || !serviceId) {
             return res.status(400).json({
@@ -35,34 +15,24 @@ router.get('/booking-slots', async (req, res) => {
             });
         }
 
-        // Читаем существующие брони
-        const data = await fs.readFile(bookingsPath, 'utf-8');
-        const bookings = JSON.parse(data);
+        const bookedSlots = db.prepare(`
+            SELECT time FROM bookings 
+            WHERE date = ? AND service_id = ?
+        `).all(date, serviceId).map(row => row.time);
 
-        // Фильтруем брони на выбранную дату и услугу
-        const bookingsOnDate = bookings.filter(booking =>
-            booking.date === date && booking.serviceId === serviceId
-        );
-
-        // Все возможные временные слоты
         const allTimeSlots = [
             '09:00', '10:00', '11:00', '12:00', '13:00',
             '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
         ];
 
-        // Занятые слоты
-        const bookedSlots = bookingsOnDate.map(booking => booking.time);
-
-        // Доступные слоты (исключаем занятые)
         const availableSlots = allTimeSlots.filter(slot => !bookedSlots.includes(slot));
 
-        console.log('Available slots:', availableSlots);
-
+        console.log('✅ Available slots:', availableSlots);
         res.json(availableSlots);
-    } catch (error) {
-        console.error('Error in booking-slots:', error);
 
-        // В случае ошибки возвращаем все слоты
+    } catch (error) {
+        console.error('❌ Error in booking-slots:', error);
+
         const allTimeSlots = [
             '09:00', '10:00', '11:00', '12:00', '13:00',
             '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
@@ -72,81 +42,84 @@ router.get('/booking-slots', async (req, res) => {
     }
 });
 
-// Роут для создания бронирований
+// Роут для создания бронирования
 router.post('/', async (req, res) => {
     try {
-        await ensureBookingsFile();
-
         const { serviceId, date, time, client } = req.body;
 
-        if (!serviceId || !date || !time || !client) {
+        console.log('📝 Creating booking:', { serviceId, date, time, client });
+
+        if (!serviceId || !date || !time || !client || !client.name || !client.phone) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields'
             });
         }
 
-        // Читаем текущие брони
-        const data = await fs.readFile(bookingsPath, 'utf-8');
-        const bookings = JSON.parse(data);
+        const existingBooking = db.prepare(`
+            SELECT id FROM bookings 
+            WHERE date = ? AND time = ? AND service_id = ?
+        `).get(date, time, serviceId);
 
-        // Создаем новую бронь
-        const newBooking = {
-            id: Date.now(),
-            serviceId: String(serviceId),
+        if (existingBooking) {
+            return res.status(409).json({
+                success: false,
+                message: 'Это время уже занято'
+            });
+        }
+
+        const stmt = db.prepare(`
+            INSERT INTO bookings (service_id, date, time, client_name, client_phone, client_comment)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
+
+        const result = stmt.run(
+            String(serviceId),
             date,
             time,
-            client,
-            createdAt: new Date().toISOString()
-        };
+            client.name.trim(),
+            client.phone,
+            client.comment || ''
+        );
 
-        // Добавляем в массив
-        bookings.push(newBooking);
-
-        // Сохраняем обратно в файл
-        await fs.writeFile(bookingsPath, JSON.stringify(bookings, null, 2));
-
-        console.log('Booking created:', newBooking);
+        console.log('✅ Booking created with ID:', result.lastInsertRowid);
 
         res.status(201).json({
             success: true,
-            message: 'Booking created successfully',
-            booking: newBooking
+            message: '✅ Запись успешно создана! Мы свяжемся с вами для подтверждения.',
+            bookingId: result.lastInsertRowid
         });
+
     } catch (error) {
-        console.error('Error creating booking:', error);
+        console.error('❌ Error creating booking:', error);
         res.status(500).json({
             success: false,
-            message: 'Error creating booking'
+            message: 'Ошибка при создании записи'
         });
     }
 });
 
-// Получение всех бронирований
+// Роут для получения всех бронирований (для админки)
 router.get('/', async (req, res) => {
     try {
-        await ensureBookingsFile();
+        const bookings = db.prepare(`
+            SELECT * FROM bookings 
+            ORDER BY date DESC, time DESC
+        `).all();
 
-        const data = await fs.readFile(bookingsPath, 'utf-8');
-        const bookings = JSON.parse(data);
+        console.log('📋 Retrieved bookings:', bookings.length);
         res.json(bookings);
     } catch (error) {
-        console.error('Error reading bookings:', error);
-        res.status(500).json({
-            message: 'Error reading bookings',
-            error: error.message
-        });
+        console.error('❌ Error reading bookings:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Получение конкретной брони
 router.get('/:id', async (req, res) => {
     try {
-        await ensureBookingsFile();
-
-        const data = await fs.readFile(bookingsPath, 'utf8');
-        const bookings = JSON.parse(data);
-        const booking = bookings.find(b => b.id === parseInt(req.params.id));
+        const booking = db.prepare(`
+            SELECT * FROM bookings WHERE id = ?
+        `).get(req.params.id);
 
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -154,11 +127,8 @@ router.get('/:id', async (req, res) => {
 
         res.json(booking);
     } catch (error) {
-        console.error('Error reading booking:', error);
-        res.status(500).json({
-            message: 'Error reading booking',
-            error: error.message
-        });
+        console.error('❌ Error reading booking:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 

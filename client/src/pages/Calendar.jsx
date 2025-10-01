@@ -23,9 +23,20 @@ const Calendar = ({
     const calendarRef = useRef(null);
 
     // Мемоизированные значения
-    const today = useMemo(() => new Date(), []);
-    const min = useMemo(() => minDate ? new Date(minDate) : today, [minDate, today]);
-    const max = useMemo(() => maxDate ? new Date(maxDate) : new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()), [maxDate, today]);
+    const today = useMemo(() => {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }, []);
+
+    const min = useMemo(() => {
+        const minDateValue = minDate ? new Date(minDate) : today;
+        return new Date(minDateValue.getFullYear(), minDateValue.getMonth(), minDateValue.getDate());
+    }, [minDate, today]);
+
+    const max = useMemo(() => {
+        const maxDateValue = maxDate ? new Date(maxDate) : new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+        return new Date(maxDateValue.getFullYear(), maxDateValue.getMonth(), maxDateValue.getDate());
+    }, [maxDate, today]);
 
     useEffect(() => {
         if (value) {
@@ -81,7 +92,13 @@ const Calendar = ({
     const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth, getDaysInMonth]);
 
     const handleDateSelect = useCallback((date) => {
-        const formattedDate = date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
+        console.log('Selected date:', date, 'Formatted:', formattedDate);
+
         onChange(formattedDate);
         setIsOpen(false);
         onBlur?.();
@@ -120,7 +137,9 @@ const Calendar = ({
     // Форматирование даты
     const formatDisplayDate = useCallback((dateString) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
+        const [year, month, day] = dateString.split('-');
+        const date = new Date(year, month - 1, day);
+
         if (isNaN(date.getTime())) return '';
 
         return date.toLocaleDateString('ru-RU', {

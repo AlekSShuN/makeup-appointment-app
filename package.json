@@ -20,7 +20,9 @@
         "lint:server": "cd server && npm run lint",
         "clean": "rm -rf node_modules client/node_modules server/node_modules"
     },
-    "dependencies": {},
+    "dependencies": {
+        "better-sqlite3": "^12.4.1"
+    },
     "devDependencies": {
         "concurrently": "^7.6.0"
     },
