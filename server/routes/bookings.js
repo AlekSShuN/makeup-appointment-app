@@ -1,6 +1,13 @@
 import express from 'express';
 const router = express.Router();
 import db from '../db.js';
+import { sendTelegramNotification } from '../telegramBot.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Роут для получения доступных слотов времени
 router.get('/booking-slots', async (req, res) => {
@@ -82,12 +89,32 @@ router.post('/', async (req, res) => {
             client.comment || ''
         );
 
-        console.log('✅ Booking created with ID:', result.lastInsertRowid);
+        const bookingId = result.lastInsertRowid;
+        console.log('✅ Booking created with ID:', bookingId);
+
+        try {
+            const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
+            const servicesData = await fs.readFile(servicesPath, 'utf8');
+            const services = JSON.parse(servicesData);
+            const service = services.find(s => s.id == serviceId);
+
+            await sendTelegramNotification({
+                serviceId,
+                date,
+                time,
+                client,
+                bookingId
+            }, service);
+
+            console.log('✅ Telegram notification sent');
+        } catch (telegramError) {
+            console.error('❌ Failed to send Telegram notification:', telegramError);
+        }
 
         res.status(201).json({
             success: true,
             message: '✅ Запись успешно создана! Мы свяжемся с вами для подтверждения.',
-            bookingId: result.lastInsertRowid
+            bookingId: bookingId
         });
 
     } catch (error) {
