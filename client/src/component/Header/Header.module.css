@@ -73,8 +73,16 @@
     width: 100%;
 }
 
-.bookingButton {
-    background: linear-gradient(135deg, #ff6b9d, #ff85a2, #ff9dae);
+/* Общие стили для всех кнопок*/
+.headerButtons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 1001;
+}
+
+/* Базовые стили для всех кнопок */
+.actionButton {
     background-size: 200% 200%;
     padding: 0.7rem 1.5rem;
     border-radius: 50px;
@@ -82,17 +90,23 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
-    z-index: 1001;
     position: relative;
     overflow: hidden;
     box-shadow:
-        0 4px 15px rgba(255, 107, 157, 0.4),
+        0 4px 15px rgba(0, 0, 0, 0.2),
         0 0 0 1px rgba(255, 255, 255, 0.2);
     font-family: sans-serif;
-    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    white-space: nowrap;
 }
 
-.bookingButton::before {
+.actionButton::before {
     content: '';
     position: absolute;
     top: 0;
@@ -103,15 +117,41 @@
     animation: shimmer 1.5s infinite;
 }
 
-.bookingButton:hover {
+.actionButton:hover {
     transform: translateY(-2px);
     box-shadow:
-        0 8px 25px rgba(255, 107, 157, 0.7),
+        0 8px 25px rgba(0, 0, 0, 0.3),
         0 0 0 2px rgba(255, 255, 255, 0.4);
     animation: gradientShift 2s ease infinite;
 }
 
-/* Гамбургер-кнопка (скрыта на десктопе) */
+.bookingButton {
+    composes: actionButton;
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2, #ff9dae);
+}
+
+.bookingButton:hover {
+    background: linear-gradient(135deg, #ff9dae, #ff6b9d, #ff85a2);
+}
+
+.adminLink {
+    composes: actionButton;
+    background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+}
+
+.adminLink:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea, #764ba2);
+}
+
+.logoutButton {
+    composes: actionButton;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e, #ff6b6b);
+}
+
+.logoutButton:hover {
+    background: linear-gradient(135deg, #ff8e8e, #ff6b6b, #ff8e8e);
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -154,7 +194,7 @@
     }
 
     .nav,
-    .bookingButton {
+    .headerButtons {
         display: none;
     }
 
@@ -188,13 +228,22 @@
         font-weight: 600;
     }
 
-    .navOpen~.bookingButton {
-        display: block;
+    .navOpen~.headerButtons,
+    .navOpen .headerButtons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
         position: fixed;
         bottom: 2rem;
         left: 50%;
         transform: translateX(-50%);
         z-index: 1001;
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .navOpen .actionButton {
+        width: 100%;
         padding: 1rem 2rem;
         font-size: 1.1rem;
     }
@@ -211,6 +260,11 @@
 
     .navOpen .navLink {
         font-size: 1.1rem;
+    }
+
+    .navOpen .actionButton {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
     }
 }
 
@@ -237,5 +291,19 @@
 
     100% {
         left: 100%;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }

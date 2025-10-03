@@ -1,6 +1,13 @@
 import express from 'express';
 const router = express.Router();
 import db from '../db.js';
+import { sendTelegramNotification } from '../telegramBot.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Роут для получения доступных слотов времени
 router.get('/booking-slots', async (req, res) => {
@@ -44,6 +51,8 @@ router.get('/booking-slots', async (req, res) => {
 
 // Роут для создания бронирования
 router.post('/', async (req, res) => {
+    let result;
+
     try {
         const { serviceId, date, time, client } = req.body;
 
@@ -73,7 +82,7 @@ router.post('/', async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
         `);
 
-        const result = stmt.run(
+        result = stmt.run(
             String(serviceId),
             date,
             time,
@@ -82,19 +91,54 @@ router.post('/', async (req, res) => {
             client.comment || ''
         );
 
-        console.log('✅ Booking created with ID:', result.lastInsertRowid);
+        const bookingId = result.lastInsertRowid;
+        console.log('✅ Booking created with ID:', bookingId);
+
+        // Отправляем Telegram уведомление
+        console.log('🔧 Starting Telegram notification process...');
+        try {
+            const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
+            const servicesData = await fs.readFile(servicesPath, 'utf8');
+            const services = JSON.parse(servicesData);
+            const service = services.find(s => s.id == serviceId);
+
+            console.log('🔧 Service for notification:', service);
+
+            if (service) {
+                console.log('🔧 Sending Telegram notification...');
+                const telegramSuccess = await sendTelegramNotification({
+                    serviceId,
+                    date,
+                    time,
+                    client,
+                    bookingId
+                }, service);
+
+                console.log('🔧 Telegram notification result:', telegramSuccess);
+            } else {
+                console.warn('⚠️ Service not found for Telegram notification');
+            }
+
+        } catch (telegramError) {
+            console.error('❌ Telegram notification error:', telegramError);
+        }
 
         res.status(201).json({
             success: true,
             message: '✅ Запись успешно создана! Мы свяжемся с вами для подтверждения.',
-            bookingId: result.lastInsertRowid
+            bookingId: bookingId
         });
 
     } catch (error) {
         console.error('❌ Error creating booking:', error);
+
+        if (result && result.lastInsertRowid) {
+            console.log('⚠️ Booking was created but other error occurred');
+        }
+
         res.status(500).json({
             success: false,
-            message: 'Ошибка при создании записи'
+            message: 'Ошибка при создании записи: ' + error.message
         });
     }
 });
@@ -102,16 +146,20 @@ router.post('/', async (req, res) => {
 // Роут для получения всех бронирований (для админки)
 router.get('/', async (req, res) => {
     try {
+        console.log('📋 Fetching all bookings for admin...');
         const bookings = db.prepare(`
             SELECT * FROM bookings 
             ORDER BY date DESC, time DESC
         `).all();
 
-        console.log('📋 Retrieved bookings:', bookings.length);
+        console.log(`📋 Retrieved ${bookings.length} bookings`);
         res.json(bookings);
     } catch (error) {
         console.error('❌ Error reading bookings:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
     }
 });
 
@@ -129,6 +177,37 @@ router.get('/:id', async (req, res) => {
     } catch (error) {
         console.error('❌ Error reading booking:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        console.log('🗑️ Deleting booking with ID:', id);
+
+        const stmt = db.prepare('DELETE FROM bookings WHERE id = ?');
+        const result = stmt.run(id);
+
+        if (result.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Запись не найдена'
+            });
+        }
+
+        console.log('✅ Booking deleted successfully');
+        res.json({
+            success: true,
+            message: 'Запись успешно удалена'
+        });
+
+    } catch (error) {
+        console.error('❌ Error deleting booking:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка при удалении записи'
+        });
     }
 });
 

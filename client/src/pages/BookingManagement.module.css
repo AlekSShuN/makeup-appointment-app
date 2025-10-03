@@ -1,0 +1,136 @@
+.bookingManagement {
+    padding: 0;
+}
+
+.managementHeader {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.managementTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filterButton {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.filterButton:hover {
+    border-color: #ff6b9d;
+    color: #ff6b9d;
+    transform: translateY(-1px);
+}
+
+.filterButton.active {
+    background: linear-gradient(135deg, #ff6b9d, #ff85a2);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+}
+
+.refreshButton {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.refreshButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.refreshButton:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.refreshButton:disabled {
+    background: #b8b8b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.loadingSpinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f1f5f9;
+    border-top: 4px solid #ff6b9d;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.loadingState p {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .managementHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filters {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filterButton {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+}
