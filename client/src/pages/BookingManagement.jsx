@@ -25,6 +25,7 @@ const BookingManagement = ({ onStatsUpdate }) => {
             }
 
             const data = await response.json();
+            console.log('✅ Bookings loaded:', data);
             console.log('✅ Bookings loaded:', data.length, 'records');
 
             setBookings(data);
@@ -45,28 +46,23 @@ const BookingManagement = ({ onStatsUpdate }) => {
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm('Вы уверены, что хотите отменить запись?')) {
             try {
-                const response = await fetch(`/api/bookings/${bookingId}`, {
-                    method: 'DELETE'
-                });
+                console.log('🔄 Mock cancel booking:', bookingId);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    setBookings(prev => prev.filter(booking => booking.id !== bookingId));
-                    console.log('✅ Booking cancelled:', bookingId);
+                setBookings(prev => prev.filter(booking => booking.id !== bookingId));
 
-                    if (onStatsUpdate) {
-                        onStatsUpdate();
-                    }
-                    alert('Запись успешно отменена');
-                } else {
-                    throw new Error('Не удалось отменить запись на сервере');
+                console.log('✅ Booking removed from UI:', bookingId);
+                alert('Запись успешно отменена (демо-режим)');
+
+                if (onStatsUpdate) {
+                    onStatsUpdate();
                 }
+
             } catch (error) {
                 console.error('❌ Ошибка отмены записи:', error);
                 alert('Не удалось отменить запись');
             }
         }
-    };
+    }
 
     const handleRefresh = () => {
         fetchBookings();
@@ -86,7 +82,6 @@ const BookingManagement = ({ onStatsUpdate }) => {
         }
     });
 
-    // Реальная статистика для фильтров
     const todayBookings = bookings.filter(booking => booking.date === new Date().toISOString().split('T')[0]).length;
     const upcomingBookings = bookings.filter(booking => booking.date >= new Date().toISOString().split('T')[0]).length;
     const pastBookings = bookings.filter(booking => booking.date < new Date().toISOString().split('T')[0]).length;
