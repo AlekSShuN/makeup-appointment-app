@@ -2,12 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Layout from "./component/Layout/Layout.jsx";
 
-
+// Ленивые импорты
 const Home = lazy(() => import('./pages/Home.jsx'));
 const Services = lazy(() => import('./pages/Services.jsx'));
 const Portfolio = lazy(() => import('./pages/Portfolio.jsx'));
 const Contacts = lazy(() => import('./pages/Contacts.jsx'));
 const Booking = lazy(() => import('./pages/Booking.jsx'));
+import AdminPanel from './pages/AdminPanel.jsx';
 
 const LoadingSpinner = () => (
     <div style={{
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
                         <Booking />
                     </Suspense>
                 )
+            },
+            {
+                path: 'admin',
+                element:
+
+                    <AdminPanel />
+
+
             },
         ],
     },

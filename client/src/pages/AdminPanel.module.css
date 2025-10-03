@@ -1,0 +1,273 @@
+.adminPanel {
+    min-height: 100vh;
+    display: flex;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.adminMain {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.adminContent {
+    flex: 1;
+    padding: 2rem;
+    background: #f8fafc;
+    min-width: 0;
+    margin-left: 280px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.adminHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 5rem;
+}
+
+.adminTitle {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2c3e50 0%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.statsCard {
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+    padding: 1.5rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 107, 157, 0.1);
+    flex-shrink: 0;
+}
+
+.statsText {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.sectionContent {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.6s ease-out;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.contentWrapper {
+    width: 100%;
+    max-width: 100%;
+    padding-top: 1rem;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filterButton {
+    padding: 10px 20px;
+    background: #f8f9fa;
+    color: #495057;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filterButton:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+}
+
+.filterButton.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.errorMessage {
+    background: #ffe6e6;
+    color: #d63031;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ff7675;
+    font-weight: 500;
+}
+
+.loadingSpinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.statsContainer {
+    display: flex;
+    gap: 16px;
+}
+
+.statsCard {
+    background: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    min-width: 140px;
+}
+
+.statsNumber {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 4px;
+}
+
+.statsLabel {
+    display: block;
+    font-size: 14px;
+    color: #666;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 1024px) {
+    .adminContent {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+        padding: 1.5rem;
+    }
+
+    .adminTitle {
+        font-size: 2rem;
+    }
+
+    .contentWrapper {
+        padding-top: 0.5rem;
+    }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .adminPanel {
+        flex-direction: column;
+    }
+
+    .adminMain {
+        flex-direction: column;
+    }
+
+    .adminContent {
+        width: 100%;
+        margin-left: 0;
+        padding: 1rem;
+        margin-top: 0;
+    }
+
+    .adminHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 0.5rem;
+    }
+
+    .adminTitle {
+        font-size: 1.8rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .statsCard {
+        width: 100%;
+        text-align: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .sectionContent {
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .contentWrapper {
+        padding-top: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .adminContent {
+        padding: 0.5rem;
+    }
+
+    .adminHeader {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .adminTitle {
+        font-size: 1.6rem;
+    }
+
+    .statsCard {
+        padding: 0.8rem 1rem;
+    }
+
+    .statsText {
+        font-size: 1rem;
+    }
+
+    .sectionContent {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+}
