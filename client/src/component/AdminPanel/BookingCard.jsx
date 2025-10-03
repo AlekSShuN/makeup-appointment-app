@@ -1,34 +1,40 @@
 import React from 'react';
-import './BookingCard.modele.css';
+import styles from './BookingCard.module.css';
 
 const BookingCard = ({ booking, onCancel }) => {
     const isPast = new Date(booking.date) < new Date();
 
+    // Используем правильные поля из сервера
+    const customerName = booking.client_name || 'Не указано';
+    const phone = booking.client_phone || 'Не указано';
+    const serviceName = booking.service_name || `Услуга #${booking.service_id}`;
+    const comment = booking.client_comment || booking.comment;
+
     return (
-        <div className={`booking-card ${isPast ? 'past' : ''}`}>
-            <div className="booking-header">
-                <h3>{booking.client.name}</h3>
-                <span className="booking-time">{booking.time}</span>
+        <div className={`${styles.bookingCard} ${isPast ? styles.past : ''}`}>
+            <div className={styles.bookingHeader}>
+                <h3>{customerName}</h3>
+                <span className={styles.bookingTime}>{booking.time}</span>
             </div>
 
-            <div className="booking-details">
-                <p><strong>Телефон:</strong> {booking.client.phone}</p>
-                <p><strong>Услуга:</strong> {booking.service?.name}</p>
+            <div className={styles.bookingDetails}>
+                <p><strong>Телефон:</strong> {phone}</p>
+                <p><strong>Услуга:</strong> {serviceName}</p>
                 <p><strong>Дата:</strong> {booking.date}</p>
-                {booking.client.comment && (
-                    <p><strong>Комментарий:</strong> {booking.client.comment}</p>
+                {comment && (
+                    <p><strong>Комментарий:</strong> {comment}</p>
                 )}
             </div>
 
             {!isPast && (
-                <div className="booking-actions">
+                <div className={styles.bookingActions}>
                     <button
-                        className="cancel-btn"
+                        className={styles.cancelBtn}
                         onClick={() => onCancel(booking.id)}
                     >
                         Отменить
                     </button>
-                    <button className="confirm-btn">
+                    <button className={styles.confirmBtn}>
                         Подтвердить
                     </button>
                 </div>

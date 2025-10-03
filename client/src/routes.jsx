@@ -1,6 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Layout from "./component/Layout/Layout.jsx";
+import AdminLogin from './pages/AdminLogin.jsx';
+import ProtectedRoute from './component/ProtectedRoute/ProtectedRoute.jsx';
+
 
 // Ленивые импорты
 const Home = lazy(() => import('./pages/Home.jsx'));
@@ -9,6 +12,7 @@ const Portfolio = lazy(() => import('./pages/Portfolio.jsx'));
 const Contacts = lazy(() => import('./pages/Contacts.jsx'));
 const Booking = lazy(() => import('./pages/Booking.jsx'));
 import AdminPanel from './pages/AdminPanel.jsx';
+const BookingManagement = lazy(() => import('./pages/BookingManagement.jsx'));
 
 const LoadingSpinner = () => (
     <div style={{
@@ -71,13 +75,25 @@ const router = createBrowserRouter([
                 )
             },
             {
-                path: 'admin',
-                element:
-
-                    <AdminPanel />
-
-
+                path: '/admin',
+                element: (
+                    <ProtectedRoute requiredRole="admin">
+                        <AdminPanel />
+                    </ProtectedRoute>
+                )
             },
+            {
+                path: '/admin-login',
+                element: <AdminLogin />
+            },
+            {
+                path: '/admin/bookings',
+                element: (
+                    <ProtectedRoute requiredRole="admin">
+                        <BookingManagement />
+                    </ProtectedRoute>
+                )
+            }
         ],
     },
 ]);
