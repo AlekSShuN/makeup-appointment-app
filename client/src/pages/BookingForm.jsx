@@ -271,7 +271,7 @@ const BookingForm = ({ services = [] }) => {
             {/* Выбор услуги */}
             <div className={styles.form_group} data-field="serviceId">
                 <label className={styles.label}>Услуга:</label>
-                <select
+                <select aria-label="Услуга"
                     value={selectedService}
                     onChange={(e) => handleServiceChange(e.target.value)}
                     onBlur={() => handleBlur('serviceId')}
