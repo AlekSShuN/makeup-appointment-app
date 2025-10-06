@@ -126,6 +126,8 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1.2;
+    padding-top: 50px;
+    position: relative;
 }
 
 .title::after {
@@ -136,6 +138,11 @@
     background: linear-gradient(90deg, #ff6b9d, #ff85a2);
     margin: 20px auto 0;
     border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.title:hover::after {
+    width: 120px;
 }
 
 .subtitle {

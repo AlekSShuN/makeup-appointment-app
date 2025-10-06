@@ -8,7 +8,6 @@ const Booking = () => {
     const [error, setError] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
 
-    // Функция загрузки услуг - ИСПРАВЛЕННАЯ ВЕРСИЯ
     const fetchServices = async () => {
         try {
             setLoading(true);
@@ -23,11 +22,8 @@ const Booking = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json(); // переменная называется result
+            const result = await response.json();
             console.log('Received data:', result);
-
-            // ИСПРАВЛЕНИЕ: используем result вместо data
-            // Просто устанавливаем данные, без проверки success
             setServices(result);
 
         } catch (error) {

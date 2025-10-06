@@ -51,6 +51,33 @@
     background: white;
 }
 
+.past_slot {
+    opacity: 0.6;
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.past_slot:hover {
+    background-color: #f5f5f5;
+    transform: none;
+}
+
+.past_badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #ff4444;
+    color: white;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+
+.time_slot {
+    position: relative;
+}
+
 .textarea {
     resize: vertical;
     min-height: 100px;

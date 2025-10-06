@@ -5,7 +5,7 @@ import Calendar from './Calendar.jsx';
 
 const API_BASE_URL = '/api';
 
-const BookingForm = ({ services }) => {
+const BookingForm = ({ services = [] }) => {
     const [selectedService, setSelectedService] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [availableSlots, setAvailableSlots] = useState([]);
@@ -22,18 +22,37 @@ const BookingForm = ({ services }) => {
 
     const { errors, validateForm, clearError, clearAllErrors } = useValidation();
 
+    // Функция проверки, является ли временной слот прошедшим
+    const isPastTimeSlot = useCallback((date, time) => {
+        if (!date || !time) return false;
+
+        const [hours, minutes] = time.split(':').map(Number);
+        const slotDateTime = new Date(date);
+        slotDateTime.setHours(hours, minutes, 0, 0);
+
+        return slotDateTime < new Date();
+    }, []);
+
     // Функция загрузки доступных слотов с отменой предыдущего запроса
     const fetchSlots = useCallback(async (date, serviceId) => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
 
+        // Очищаем предыдущий выбор времени при смене даты/услуги
+        setSelectedTime('');
+
         abortControllerRef.current = new AbortController();
 
         try {
             const response = await fetch(
                 `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`,
-                { signal: abortControllerRef.current.signal }
+                {
+                    signal: abortControllerRef.current.signal,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
             );
 
             if (!response.ok) {
@@ -41,15 +60,26 @@ const BookingForm = ({ services }) => {
             }
 
             const slots = await response.json();
-            setAvailableSlots(slots);
+
+            // Фильтруем прошедшие временные слоты
+            const filteredSlots = slots.filter(slot => !isPastTimeSlot(date, slot));
+
+            setAvailableSlots(filteredSlots);
+
+            // Если выбранное время стало недоступно, сбрасываем его
+            if (selectedTime && !filteredSlots.includes(selectedTime)) {
+                setSelectedTime('');
+            }
         } catch (error) {
             if (error.name !== 'AbortError') {
                 console.error('Error fetching slots:', error);
                 setAvailableSlots([]);
+                setSelectedTime('');
             }
         }
-    }, []);
+    }, [isPastTimeSlot, selectedTime]);
 
+    // Очистка при размонтировании
     useEffect(() => {
         return () => {
             if (abortControllerRef.current) {
@@ -75,7 +105,13 @@ const BookingForm = ({ services }) => {
         return () => clearTimeout(timeoutId);
     }, [validateFormDebounced]);
 
-    const safeServices = Array.isArray(services) ? services : [];
+    // Проверка выбранного времени при изменении даты или времени
+    useEffect(() => {
+        if (selectedDate && selectedTime && isPastTimeSlot(selectedDate, selectedTime)) {
+            setSelectedTime('');
+            clearError('time');
+        }
+    }, [selectedDate, selectedTime, isPastTimeSlot, clearError]);
 
     const handleServiceChange = useCallback((serviceId) => {
         setSelectedService(serviceId);
@@ -84,7 +120,6 @@ const BookingForm = ({ services }) => {
         setTouched(prev => ({ ...prev, serviceId: true }));
         clearError('serviceId');
 
-        // Загрузка слотов если дата уже выбрана
         if (selectedDate && serviceId) {
             fetchSlots(selectedDate, serviceId);
         }
@@ -96,7 +131,6 @@ const BookingForm = ({ services }) => {
         setTouched(prev => ({ ...prev, date: true }));
         clearError('date');
 
-        // Загрузка слотов если услуга уже выбрана
         if (date && selectedService) {
             fetchSlots(date, selectedService);
         }
@@ -114,16 +148,20 @@ const BookingForm = ({ services }) => {
 
     const formatPhone = useCallback((value) => {
         const numbers = value.replace(/\D/g, '');
+
+        // Если пользователь стер номер полностью
+        if (!numbers || numbers === '7') return '';
+
         let formattedValue = value;
 
         if (numbers.length <= 1) {
             formattedValue = numbers ? '+7' : '';
         } else if (numbers.length <= 4) {
-            formattedValue = `+7(${numbers.slice(1, 4)}`;
+            formattedValue = `+7 (${numbers.slice(1, 4)}`;
         } else if (numbers.length <= 7) {
             formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}`;
         } else if (numbers.length <= 9) {
-            formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)} - ${numbers.slice(7, 9)}`;
+            formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}-${numbers.slice(7, 9)}`;
         } else {
             formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}-${numbers.slice(7, 9)}-${numbers.slice(9, 11)}`;
         }
@@ -136,10 +174,16 @@ const BookingForm = ({ services }) => {
     }, [formatPhone, handleInputChange]);
 
     const handleTimeSelect = useCallback((time) => {
+        // Проверяем, не является ли выбранное время прошедшим
+        if (selectedDate && isPastTimeSlot(selectedDate, time)) {
+            clearError('time');
+            return;
+        }
+
         setSelectedTime(time);
         setTouched(prev => ({ ...prev, time: true }));
         clearError('time');
-    }, [clearError]);
+    }, [selectedDate, isPastTimeSlot, clearError]);
 
     const formSubmissionHandler = async (event) => {
         event.preventDefault();
@@ -152,6 +196,13 @@ const BookingForm = ({ services }) => {
             phone: true,
         };
         setTouched(allTouchedFields);
+
+        // Финальная проверка на прошедшее время
+        if (selectedDate && selectedTime && isPastTimeSlot(selectedDate, selectedTime)) {
+            setSubmitMessage('❌ Выбранное время уже прошло. Пожалуйста, выберите другое время.');
+            setSelectedTime('');
+            return;
+        }
 
         const formData = {
             serviceId: selectedService,
@@ -192,6 +243,7 @@ const BookingForm = ({ services }) => {
 
             if (response.ok) {
                 setSubmitMessage('✅ Ваша заявка принята! Мы свяжемся с вами для подтверждения.');
+                // Сброс формы
                 setSelectedService('');
                 setSelectedDate('');
                 setSelectedTime('');
@@ -211,7 +263,8 @@ const BookingForm = ({ services }) => {
 
     const isFormValid = selectedService && selectedDate && selectedTime &&
         clientData.name?.trim() &&
-        clientData.phone?.replace(/\D/g, '').length >= 11;
+        clientData.phone?.replace(/\D/g, '').length >= 11 &&
+        !isPastTimeSlot(selectedDate, selectedTime); // Добавляем проверку на прошедшее время
 
     return (
         <form onSubmit={formSubmissionHandler} className={styles.form} noValidate>
@@ -226,7 +279,7 @@ const BookingForm = ({ services }) => {
                     required
                 >
                     <option value="">Выберите услугу</option>
-                    {safeServices.map(service => (
+                    {services.map(service => (
                         <option key={service.id} value={service.id}>
                             {service.name} ({service.price}руб.)
                         </option>
@@ -259,17 +312,23 @@ const BookingForm = ({ services }) => {
                 <div className={styles.form_group} data-field="time">
                     <label className={styles.label}>Доступное время:</label>
                     <div className={styles.time_slots}>
-                        {availableSlots.map(slot => (
-                            <button
-                                key={slot}
-                                type="button"
-                                className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''
-                                    }`}
-                                onClick={() => handleTimeSelect(slot)}
-                            >
-                                {slot}
-                            </button>
-                        ))}
+                        {availableSlots.map(slot => {
+                            const isPast = isPastTimeSlot(selectedDate, slot);
+                            return (
+                                <button
+                                    key={slot}
+                                    type="button"
+                                    className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''
+                                        } ${isPast ? styles.past_slot : ''}`}
+                                    onClick={() => !isPast && handleTimeSelect(slot)}
+                                    disabled={isPast}
+                                    title={isPast ? "Это время уже прошло" : ""}
+                                >
+                                    {slot}
+                                    {isPast && <span className={styles.past_badge}>прошло</span>}
+                                </button>
+                            );
+                        })}
                     </div>
                     {errors.time && (
                         <span className={styles.errorText}>{errors.time}</span>
@@ -326,7 +385,7 @@ const BookingForm = ({ services }) => {
             <button
                 className={styles.submit_button}
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isFormValid}
             >
                 {isSubmitting ? (
                     <>

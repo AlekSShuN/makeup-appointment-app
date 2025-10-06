@@ -8,7 +8,6 @@ const Header = () => {
     const [clickCount, setClickCount] = useState(0);
     const clickTimerRef = useRef(null);
 
-    // Проверяем при загрузке, авторизован ли админ
     useEffect(() => {
         const adminAuth = localStorage.getItem('adminAuth');
         if (adminAuth === 'true') {

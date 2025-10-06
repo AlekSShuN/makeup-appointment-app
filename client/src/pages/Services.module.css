@@ -4,9 +4,6 @@
     position: relative;
     min-height: 100vh;
     overflow: hidden;
-    opacity: 1;
-    transform: translateY(30px);
-    transition: all 0.8s ease;
 }
 
 .services::before {
@@ -22,11 +19,6 @@
     pointer-events: none;
 }
 
-.services.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -36,6 +28,7 @@
 .header {
     text-align: center;
     margin-bottom: 60px;
+    padding-top: 50px;
 }
 
 .section_title {
@@ -50,6 +43,8 @@
     line-height: 1.2;
     text-align: center;
     position: relative;
+    animation: fadeIn 0.6s ease;
+
 }
 
 .section_title::after {
@@ -74,6 +69,7 @@
     margin: 0 auto;
     line-height: 1.6;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: fadeIn 0.6s ease 0.2s both;
 }
 
 .pricingGrid {

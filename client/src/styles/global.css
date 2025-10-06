@@ -122,7 +122,7 @@ img {
     }
 }
 
-/*Дополнительные утилитные классы для адаптива*/
+
 .mobile-only {
     display: none !important;
 }
