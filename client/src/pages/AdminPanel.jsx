@@ -5,6 +5,7 @@ import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
     const [activeSection, setActiveSection] = useState('bookings');
+    const [bookings, setBookings] = useState([]);
     const [todayStats, setTodayStats] = useState(0);
     const [totalStats, setTotalStats] = useState(0);
 
@@ -15,38 +16,84 @@ const AdminPanel = () => {
             window.location.href = '/';
         }
 
-        // Загружаем статистику при монтировании
-        fetchStats();
+        // Загружаем бронирования и статистику при монтировании
+        fetchBookings();
     }, []);
 
-    const fetchStats = async () => {
+    const fetchBookings = async () => {
         try {
             const response = await fetch('/api/bookings');
             if (response.ok) {
-                const bookings = await response.json();
-
-                // Статистика на сегодня
-                const today = new Date().toISOString().split('T')[0];
-                const todayCount = bookings.filter(booking => booking.date === today).length;
-                setTodayStats(todayCount);
-
-                // Общее количество записей
-                setTotalStats(bookings.length);
+                const bookingsData = await response.json();
+                setBookings(bookingsData);
+                updateStats(bookingsData);
             }
         } catch (error) {
-            console.error('Error fetching stats:', error);
+            console.error('Error fetching bookings:', error);
         }
     };
 
-    // Функция для обновления статистики из дочернего компонента
-    const handleStatsUpdate = () => {
-        fetchStats();
+    const updateStats = (bookingsData) => {
+        // Статистика на сегодня
+        const today = new Date().toISOString().split('T')[0];
+        const todayCount = bookingsData.filter(booking => booking.date === today).length;
+        setTodayStats(todayCount);
+
+        // Общее количество записей
+        setTotalStats(bookingsData.length);
+    };
+
+    const handleDeleteBooking = async (bookingId) => {
+        try {
+            console.log('🗑️ Sending DELETE request for booking:', bookingId);
+
+            const response = await fetch(`/api/bookings/${bookingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('📡 DELETE response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Server error response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ DELETE response data:', result);
+
+            if (result.success) {
+                const updatedBookings = bookings.filter(booking => booking.id !== bookingId);
+                setBookings(updatedBookings);
+                updateStats(updatedBookings);
+
+                return true;
+            } else {
+                throw new Error(result.message || 'Неизвестная ошибка сервера');
+            }
+        } catch (error) {
+            console.error('❌ Error deleting booking:', error);
+            return false;
+        }
+    };
+
+    const handleRefresh = () => {
+        fetchBookings();
     };
 
     const renderSection = () => {
         switch (activeSection) {
             case 'bookings':
-                return <BookingManagement onStatsUpdate={handleStatsUpdate} />;
+                return (
+                    <BookingManagement
+                        bookings={bookings}
+                        onDeleteBooking={handleDeleteBooking}
+                        onRefresh={handleRefresh}
+                    />
+                );
             case 'analytics':
                 return (
                     <div className={styles.sectionContent}>
@@ -62,7 +109,13 @@ const AdminPanel = () => {
                     </div>
                 );
             default:
-                return <BookingManagement onStatsUpdate={handleStatsUpdate} />;
+                return (
+                    <BookingManagement
+                        bookings={bookings}
+                        onDeleteBooking={handleDeleteBooking}
+                        onRefresh={handleRefresh}
+                    />
+                );
         }
     };
 

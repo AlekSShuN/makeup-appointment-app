@@ -1,71 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import BookingList from '../component/AdminPanel/BookingList.jsx';
 import styles from './BookingManagement.module.css';
 
-const BookingManagement = ({ onStatsUpdate }) => {
-    const [bookings, setBookings] = useState([]);
+const BookingManagement = ({ bookings, onDeleteBooking, onRefresh }) => {
     const [filter, setFilter] = useState('all');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    useEffect(() => {
-        fetchBookings();
-    }, []);
-
-    const fetchBookings = async () => {
-        try {
-            setLoading(true);
-            setError('');
-
-            console.log('📋 Fetching bookings from API...');
-            const response = await fetch('/api/bookings');
-
-            if (!response.ok) {
-                throw new Error(`Ошибка сервера: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('✅ Bookings loaded:', data);
-            console.log('✅ Bookings loaded:', data.length, 'records');
-
-            setBookings(data);
-
-            // Уведомляем родительский компонент об обновлении статистики
-            if (onStatsUpdate) {
-                onStatsUpdate();
-            }
-
-        } catch (error) {
-            console.error('❌ Ошибка загрузки записей:', error);
-            setError('Не удалось загрузить записи. Проверьте подключение к серверу.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm('Вы уверены, что хотите отменить запись?')) {
             try {
-                console.log('🔄 Mock cancel booking:', bookingId);
+                setLoading(true);
+                setError('');
 
-                setBookings(prev => prev.filter(booking => booking.id !== bookingId));
+                console.log('🔄 Starting cancel process for booking:', bookingId);
 
-                console.log('✅ Booking removed from UI:', bookingId);
-                alert('Запись успешно отменена (демо-режим)');
+                const success = await onDeleteBooking(bookingId);
 
-                if (onStatsUpdate) {
-                    onStatsUpdate();
+                if (success) {
+                    console.log('✅ Booking cancelled successfully:', bookingId);
+                    alert('✅ Запись успешно отменена');
+                } else {
+                    throw new Error('Не удалось отменить запись. Попробуйте еще раз.');
                 }
-
             } catch (error) {
                 console.error('❌ Ошибка отмены записи:', error);
-                alert('Не удалось отменить запись');
+                setError(error.message);
+                alert(`❌ Не удалось отменить запись: ${error.message}`);
+            } finally {
+                setLoading(false);
             }
         }
-    }
+    };
 
     const handleRefresh = () => {
-        fetchBookings();
+        setLoading(true);
+        onRefresh();
+        // Загрузка закончится когда onRefresh завершится
+        setTimeout(() => setLoading(false), 1000);
     };
 
     const filteredBookings = bookings.filter(booking => {
@@ -82,6 +54,7 @@ const BookingManagement = ({ onStatsUpdate }) => {
         }
     });
 
+    // Реальная статистика для фильтров
     const todayBookings = bookings.filter(booking => booking.date === new Date().toISOString().split('T')[0]).length;
     const upcomingBookings = bookings.filter(booking => booking.date >= new Date().toISOString().split('T')[0]).length;
     const pastBookings = bookings.filter(booking => booking.date < new Date().toISOString().split('T')[0]).length;

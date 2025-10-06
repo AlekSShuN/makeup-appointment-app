@@ -142,6 +142,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+//Роут удаления
 router.get('/:id', async (req, res) => {
     try {
         const booking = db.prepare(`
@@ -156,6 +157,41 @@ router.get('/:id', async (req, res) => {
     } catch (error) {
         console.error('❌ Error reading booking:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        console.log('🗑️ Deleting booking with ID:', id);
+
+        const existingBooking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(id);
+
+        if (!existingBooking) {
+            return res.status(404).json({
+                success: false,
+                message: 'Запись не найдена'
+            });
+        }
+
+        const stmt = db.prepare('DELETE FROM bookings WHERE id = ?');
+        const result = stmt.run(id);
+
+        console.log('✅ Booking deleted successfully, changes:', result.changes);
+
+        res.json({
+            success: true,
+            message: 'Запись успешно удалена',
+            deletedId: id
+        });
+
+    } catch (error) {
+        console.error('❌ Error deleting booking:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка при удалении записи: ' + error.message
+        });
     }
 });
 
