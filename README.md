@@ -3,7 +3,7 @@ SPA для визажиста с системой записи клиентов
 
 Стек:
 Frontend: React, React Router, Vite, CSS Module
-Back: Node.js, Express.js, MongoDB
+Back: Node.js, Express.js, SQLLite
 Сборка: Vite
 
 Установка: 
