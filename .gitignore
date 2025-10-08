@@ -177,4 +177,5 @@ Thumbs.db
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.dbclient/bundle-stats.html
+server/.env*.txt

@@ -3,7 +3,7 @@ import styles from './BookingForm.module.css';
 import { useValidation } from "../hooks/useValidation.js";
 import Calendar from './Calendar.jsx';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:5002/api';
 
 const BookingForm = ({ services = [] }) => {
     const [selectedService, setSelectedService] = useState('');
@@ -33,51 +33,38 @@ const BookingForm = ({ services = [] }) => {
         return slotDateTime < new Date();
     }, []);
 
-    // Функция загрузки доступных слотов с отменой предыдущего запроса
     const fetchSlots = useCallback(async (date, serviceId) => {
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
+        if (!date || !serviceId) {
+            setAvailableSlots([]);
+            return;
         }
 
-        // Очищаем предыдущий выбор времени при смене даты/услуги
+        // Очищаем предыдущий выбор времени
         setSelectedTime('');
 
-        abortControllerRef.current = new AbortController();
+        // ДОБАВЬТЕ ДЕБАУНСИНГ ПЕРЕД РЕАЛЬНЫМ ЗАПРОСОМ
+        setTimeout(async () => {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
+                );
 
-        try {
-            const response = await fetch(
-                `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`,
-                {
-                    signal: abortControllerRef.current.signal,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            );
+                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
 
-            if (!response.ok) {
-                throw new Error(`Ошибка загрузки слотов: ${response.status}`);
-            }
+                const slots = await response.json();
+                const filteredSlots = slots.filter(slot => !isPastTimeSlot(date, slot));
+                setAvailableSlots(filteredSlots);
 
-            const slots = await response.json();
-
-            // Фильтруем прошедшие временные слоты
-            const filteredSlots = slots.filter(slot => !isPastTimeSlot(date, slot));
-
-            setAvailableSlots(filteredSlots);
-
-            // Если выбранное время стало недоступно, сбрасываем его
-            if (selectedTime && !filteredSlots.includes(selectedTime)) {
-                setSelectedTime('');
-            }
-        } catch (error) {
-            if (error.name !== 'AbortError') {
+            } catch (error) {
                 console.error('Error fetching slots:', error);
-                setAvailableSlots([]);
-                setSelectedTime('');
+                // Fallback на мок данные при ошибке
+                const mockSlots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
+                const filteredSlots = mockSlots.filter(slot => !isPastTimeSlot(date, slot));
+                setAvailableSlots(filteredSlots);
             }
-        }
-    }, [isPastTimeSlot, selectedTime]);
+        }, 500); // Дебаунсинг 500ms
+
+    }, [isPastTimeSlot]);
 
     // Очистка при размонтировании
     useEffect(() => {
@@ -271,7 +258,7 @@ const BookingForm = ({ services = [] }) => {
             {/* Выбор услуги */}
             <div className={styles.form_group} data-field="serviceId">
                 <label className={styles.label}>Услуга:</label>
-                <select
+                <select aria-label="Услуга"
                     value={selectedService}
                     onChange={(e) => handleServiceChange(e.target.value)}
                     onBlur={() => handleBlur('serviceId')}

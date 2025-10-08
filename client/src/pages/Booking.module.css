@@ -207,7 +207,6 @@
 @media (max-width: 768px) {
 
     .booking {
-        background: linear-gradient(135deg, var(--secondary-color), var(--pink-light));
         padding: 40px 0;
     }
 
