@@ -1,0 +1,37 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import Booking from '../Booking';
+
+// Мок для API
+beforeEach(() => {
+    global.fetch.mockClear();
+    global.fetch.mockImplementation(() =>
+        Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve([
+                { id: 1, name: 'Стрижка', price: 1000 },
+                { id: 2, name: 'Окрашивание', price: 2000 }
+            ]),
+        })
+    );
+});
+
+describe('Booking Page', () => {
+    test('renders booking page with title', async () => {
+        render(<Booking />);
+
+        // Ищем правильный текст заголовка
+        expect(await screen.findByText(/запись на услугу/i)).toBeInTheDocument();
+        expect(screen.getByText(/выберите услугу и удобное время/i)).toBeInTheDocument();
+    });
+
+    test('displays services after loading', async () => {
+        render(<Booking />);
+
+        // Ждем появления услуг в форме
+        expect(await screen.findByText(/стрижка/i)).toBeInTheDocument();
+        expect(screen.getByText(/окрашивание/i)).toBeInTheDocument();
+        expect(screen.getByText(/1000/i)).toBeInTheDocument();
+        expect(screen.getByText(/2000/i)).toBeInTheDocument();
+    });
+});

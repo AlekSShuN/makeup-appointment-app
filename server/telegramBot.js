@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Явно указываем путь к .env файлу
 const envPath = path.join(__dirname, '.env');
 console.log('🔧 Loading .env from:', envPath);
 
@@ -78,7 +77,7 @@ ${bookingData.client.comment ? `💬 ${bookingData.client.comment}` : ''}
     }
 };
 
-// 2. Напоминание за день
+//Напоминание за день
 export const sendReminder = async (booking) => {
     if (!bot || !chatId) {
         console.warn('Telegram bot not configured');
@@ -110,7 +109,7 @@ export const sendReminder = async (booking) => {
     }
 };
 
-// 3. Отмена записи
+//Отмена записи
 export const sendCancellation = async (booking) => {
     if (!bot || !chatId) {
         console.warn('Telegram bot not configured');

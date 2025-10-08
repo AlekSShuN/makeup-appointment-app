@@ -22,14 +22,13 @@ const AdminPanel = () => {
 
     const fetchBookings = async () => {
         try {
-            const response = await fetch('/api/bookings');
-            if (response.ok) {
-                const bookingsData = await response.json();
-                setBookings(bookingsData);
-                updateStats(bookingsData);
-            }
+            const response = await fetch('http://localhost:5002/api/bookings');
+            if (!response.ok) throw new Error('Ошибка загрузки записей');
+            const data = await response.json();
+            setBookings(data);
         } catch (error) {
             console.error('Error fetching bookings:', error);
+            setError(error.message);
         }
     };
 

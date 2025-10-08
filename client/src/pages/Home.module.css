@@ -199,178 +199,6 @@
     background: rgba(255, 255, 255, 0.7);
 }
 
-/* Анимации */
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Адаптив для секции Hero */
-@media (max-width: 1200px) {
-    .heroContent {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-    }
-
-    .heroText {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .heroFeatures {
-        max-width: 500px;
-        margin: 0 auto;
-    }
-}
-
-@media (max-width: 968px) {
-    .heroTitle {
-        font-size: 3rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1.1rem;
-    }
-
-    .heroFeatures {
-        padding: 2rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .hero {
-        height: 90vh;
-        min-height: 500px;
-    }
-
-    .heroContent {
-        padding: 0 1.5rem;
-        gap: 2rem;
-    }
-
-    .heroTitle {
-        font-size: 2.5rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-    }
-
-    .heroButtons {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        width: 100%;
-        max-width: 280px;
-        text-align: center;
-    }
-
-    .heroFeatures {
-        padding: 1.5rem;
-        gap: 1rem;
-    }
-
-    .featureItem {
-        font-size: 1rem;
-    }
-
-    .featureIcon {
-        font-size: 1.5rem;
-        width: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        min-height: 600px;
-        height: 100vh;
-    }
-
-    .heroContent {
-        padding: 0 1rem;
-    }
-
-    .heroTitle {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .heroButtons {
-        gap: 0.8rem;
-    }
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-    }
-
-    .heroFeatures {
-        padding: 1.2rem;
-    }
-
-    .featureItem {
-        font-size: 0.9rem;
-        gap: 0.8rem;
-    }
-
-    .featureIcon {
-        font-size: 1.3rem;
-        width: 35px;
-    }
-
-    .heroSliderDots {
-        bottom: 1rem;
-    }
-
-    .sliderDot {
-        width: 10px;
-        height: 10px;
-    }
-}
-
-@media (max-height: 700px) and (orientation: landscape) {
-    .hero {
-        height: auto;
-        min-height: 100vh;
-        padding: 4rem 0;
-    }
-
-    .heroContent {
-        gap: 2rem;
-    }
-}
-
 /* Common Sections */
 .container {
     margin: 0 auto;
@@ -463,13 +291,16 @@
     height: 340px;
     overflow: hidden;
     border-radius: 15px;
+    flex-shrink: 0;
 }
 
 .serviceImage {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform 0.3s ease;
+    background-color: #f8f9fa;
+    border-radius: 15px;
 }
 
 .serviceCard:hover .serviceImage {
@@ -483,6 +314,7 @@
 .serviceTitle {
     font-size: 1.3rem;
     font-weight: 600;
+    flex-grow: 1;
     color: #2c3e50;
     margin-bottom: 0.5rem;
 }
@@ -643,7 +475,380 @@
     color: #2c3e50;
 }
 
-/* Particles */
+/* Адаптивность для планшетов (1024px и меньше) */
+@media (max-width: 1024px) {
+    .heroContent {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .heroText {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .heroFeatures {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .aboutContent {
+        gap: 3rem;
+    }
+
+    .servicesGrid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .testimonialsGrid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+/* Адаптивность для средних планшетов (768px и меньше) */
+@media (max-width: 768px) {
+    .hero {
+        height: 90vh;
+        min-height: 500px;
+    }
+
+    .heroContent {
+        padding: 0 1.5rem;
+        gap: 2rem;
+    }
+
+    .heroTitle {
+        font-size: 2.5rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+    }
+
+    .heroFeatures {
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+
+    .featureItem {
+        font-size: 1rem;
+    }
+
+    .featureIcon {
+        font-size: 1.5rem;
+        width: 40px;
+    }
+
+    .about {
+        padding: 60px 0;
+    }
+
+    .aboutContent {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .aboutText {
+        text-align: center;
+    }
+
+    .aboutParagraph {
+        text-align: center;
+    }
+
+    .aboutImage {
+        max-width: 300px;
+        height: 400px;
+        order: -1;
+    }
+
+    .featuredServices,
+    .testimonials {
+        padding: 3rem 0;
+    }
+
+    .servicesGrid,
+    .testimonialsGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 2rem;
+    }
+
+    .imageContainer {
+        height: 280px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+}
+
+/* Адаптивность для мобильных устройств (480px и меньше) */
+@media (max-width: 480px) {
+    .hero {
+        min-height: 600px;
+        height: 100vh;
+    }
+
+    .heroContent {
+        padding: 0 1rem;
+    }
+
+    .heroTitle {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .heroButtons {
+        gap: 0.8rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .heroFeatures {
+        padding: 1.2rem;
+    }
+
+    .featureItem {
+        font-size: 0.9rem;
+        gap: 0.8rem;
+    }
+
+    .featureIcon {
+        font-size: 1.3rem;
+        width: 35px;
+    }
+
+    .heroSliderDots {
+        bottom: 1rem;
+    }
+
+    .sliderDot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .section_title {
+        font-size: 2rem;
+        padding-bottom: 20px;
+    }
+
+    .about {
+        padding: 40px 0;
+    }
+
+    .aboutImage {
+        max-width: 100%;
+        height: 350px;
+    }
+
+    .aboutSubtitle {
+        font-size: 1.3rem;
+    }
+
+    .aboutParagraph {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .featuredServices,
+    .testimonials {
+        padding: 2rem 0;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 1.5rem;
+    }
+
+    .imageContainer {
+        height: 250px;
+    }
+
+    .serviceTitle {
+        font-size: 1.2rem;
+    }
+
+    .price {
+        font-size: 1.1rem;
+    }
+
+    .testimonialText {
+        font-size: 1rem;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+}
+
+/* Адаптивность для очень маленьких экранов (320px и меньше) */
+@media (max-width: 320px) {
+    .heroTitle {
+        font-size: 1.8rem;
+    }
+
+    .heroSubtitle {
+        font-size: 0.9rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+    }
+
+    .section_title {
+        font-size: 1.8rem;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 1rem;
+    }
+
+    .imageContainer {
+        height: 200px;
+    }
+}
+
+/* Поддержка landscape ориентации на мобильных */
+@media (max-height: 700px) and (orientation: landscape) {
+    .hero {
+        height: auto;
+        min-height: 100vh;
+        padding: 4rem 0;
+    }
+
+    .heroContent {
+        gap: 2rem;
+    }
+
+    .heroTitle {
+        font-size: 2rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Улучшенная поддержка touch устройств */
+@media (hover: none) and (pointer: coarse) {
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 12px 20px;
+        min-height: 44px;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 1.5rem;
+    }
+}
+
+/* Анимации */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes titleSlide {
+    from {
+        opacity: 1;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatParticle {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-100vh) rotate(360deg) scale(1.5);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Остальные стили остаются без изменений */
 .floatingParticle {
     position: absolute;
     background: linear-gradient(135deg, #ff85a2, #ff6b9d);
@@ -652,7 +857,6 @@
     pointer-events: none;
 }
 
-/* Loading Screen */
 .loadingScreen {
     position: fixed;
     top: 0;
@@ -704,7 +908,6 @@
     font-size: 1.1rem;
 }
 
-/*Улучшенная семантика для скринридера*/
 .sr-only {
     position: absolute;
     width: 1px;
@@ -731,60 +934,5 @@
     .serviceCard,
     .testimonialCard {
         transition: none;
-    }
-}
-
-/* Animations */
-@keyframes floatParticle {
-    0% {
-        transform: translateY(0) rotate(0deg) scale(1);
-        opacity: 1;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(-100vh) rotate(360deg) scale(1.5);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 1;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes titleSlide {
-    from {
-        opacity: 1;
-        transform: translateY(-30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }

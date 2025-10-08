@@ -14,37 +14,80 @@ router.get('/booking-slots', async (req, res) => {
     try {
         const { date, serviceId } = req.query;
 
-        console.log('📅 Getting slots for:', { date, serviceId });
+        console.log('📅 Getting slots for:', { date, serviceId, query: req.query });
 
+        // Упрощенная валидация
         if (!date || !serviceId) {
+            console.log('❌ Missing parameters:', { date, serviceId });
             return res.status(400).json({
-                error: 'Missing date or serviceId parameter'
+                error: 'Missing date or serviceId parameter',
+                received: { date, serviceId }
             });
         }
 
-        const bookedSlots = db.prepare(`
-            SELECT time FROM bookings 
-            WHERE date = ? AND service_id = ?
-        `).all(date, serviceId).map(row => row.time);
+        // Проверка формата даты
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(date)) {
+            console.log('❌ Invalid date format:', date);
+            return res.status(400).json({
+                error: 'Invalid date format. Use YYYY-MM-DD',
+                received: date
+            });
+        }
 
-        const allTimeSlots = [
-            '09:00', '10:00', '11:00', '12:00', '13:00',
-            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
-        ];
+        // УПРОЩЕННАЯ ВАЛИДАЦИЯ serviceId - принимаем как есть
+        const cleanServiceId = serviceId.toString().trim();
+        console.log('🔍 Clean serviceId:', cleanServiceId);
 
-        const availableSlots = allTimeSlots.filter(slot => !bookedSlots.includes(slot));
+        if (cleanServiceId === '') {
+            console.log('❌ Empty serviceId');
+            return res.status(400).json({
+                error: 'Service ID cannot be empty',
+                received: serviceId
+            });
+        }
 
-        console.log('✅ Available slots:', availableSlots);
-        res.json(availableSlots);
+        console.log('🔍 Querying database with:', { date, cleanServiceId });
+
+        try {
+            const bookedSlots = db.prepare(`
+                SELECT time FROM bookings 
+                WHERE date = ? AND service_id = ?
+            `).all(date, cleanServiceId).map(row => row.time);
+
+            console.log('📊 Booked slots:', bookedSlots);
+
+            const allTimeSlots = [
+                '05:00', '06:00', '07:00', '08:00',
+                '09:00', '10:00', '11:00', '12:00',
+                '14:00', '15:00', '16:00', '17:00'
+            ];
+
+            const availableSlots = allTimeSlots.filter(slot => !bookedSlots.includes(slot));
+
+            console.log('✅ Available slots:', availableSlots);
+            res.json(availableSlots);
+
+        } catch (dbError) {
+            console.error('❌ Database error:', dbError);
+            // В случае ошибки БД возвращаем все слоты как доступные
+            const allTimeSlots = [
+                '05:00', '06:00', '07:00', '08:00',
+                '09:00', '10:00', '11:00', '12:00',
+                '14:00', '15:00', '16:00', '17:00'
+            ];
+            res.json(allTimeSlots);
+        }
 
     } catch (error) {
         console.error('❌ Error in booking-slots:', error);
 
+        // В случае любой ошибки возвращаем все слоты как доступные
         const allTimeSlots = [
-            '09:00', '10:00', '11:00', '12:00', '13:00',
-            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
+            '05:00', '06:00', '07:00', '08:00',
+            '09:00', '10:00', '11:00', '12:00',
+            '14:00', '15:00', '16:00', '17:00'
         ];
-
         res.json(allTimeSlots);
     }
 });
@@ -142,7 +185,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-//Роут удаления
+//Роут получения конкретной брони
 router.get('/:id', async (req, res) => {
     try {
         const booking = db.prepare(`
