@@ -5,6 +5,7 @@ import { sendTelegramNotification } from '../telegramBot.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { checkAdminAuth } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +26,6 @@ router.get('/booking-slots', async (req, res) => {
             });
         }
 
-        // Проверка формата даты
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(date)) {
             console.log('❌ Invalid date format:', date);
@@ -35,7 +35,6 @@ router.get('/booking-slots', async (req, res) => {
             });
         }
 
-        // УПРОЩЕННАЯ ВАЛИДАЦИЯ serviceId - принимаем как есть
         const cleanServiceId = serviceId.toString().trim();
         console.log('🔍 Clean serviceId:', cleanServiceId);
 
@@ -58,7 +57,7 @@ router.get('/booking-slots', async (req, res) => {
             console.log('📊 Booked slots:', bookedSlots);
 
             const allTimeSlots = [
-                '05:00', '06:00', '07:00', '08:00',
+                '06:00', '07:00', '08:00',
                 '09:00', '10:00', '11:00', '12:00',
                 '14:00', '15:00', '16:00', '17:00'
             ];
@@ -70,9 +69,8 @@ router.get('/booking-slots', async (req, res) => {
 
         } catch (dbError) {
             console.error('❌ Database error:', dbError);
-            // В случае ошибки БД возвращаем все слоты как доступные
             const allTimeSlots = [
-                '05:00', '06:00', '07:00', '08:00',
+                '06:00', '07:00', '08:00',
                 '09:00', '10:00', '11:00', '12:00',
                 '14:00', '15:00', '16:00', '17:00'
             ];
@@ -82,9 +80,8 @@ router.get('/booking-slots', async (req, res) => {
     } catch (error) {
         console.error('❌ Error in booking-slots:', error);
 
-        // В случае любой ошибки возвращаем все слоты как доступные
         const allTimeSlots = [
-            '05:00', '06:00', '07:00', '08:00',
+            '06:00', '07:00', '08:00',
             '09:00', '10:00', '11:00', '12:00',
             '14:00', '15:00', '16:00', '17:00'
         ];
@@ -170,7 +167,7 @@ router.post('/', async (req, res) => {
 });
 
 // Роут для получения всех бронирований (для админки)
-router.get('/', async (req, res) => {
+router.get('/', checkAdminAuth, async (req, res) => {
     try {
         const bookings = db.prepare(`
             SELECT * FROM bookings 
@@ -186,7 +183,7 @@ router.get('/', async (req, res) => {
 });
 
 //Роут получения конкретной брони
-router.get('/:id', async (req, res) => {
+router.get('/:id', checkAdminAuth, async (req, res) => {
     try {
         const booking = db.prepare(`
             SELECT * FROM bookings WHERE id = ?
@@ -203,7 +200,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', checkAdminAuth, async (req, res) => {
     try {
         const { id } = req.params;
 

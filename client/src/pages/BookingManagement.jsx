@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import BookingList from '../component/AdminPanel/BookingList.jsx';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './BookingManagement.module.css';
 
-const BookingManagement = ({ bookings, onDeleteBooking, onRefresh }) => {
+const BookingManagement = ({ bookings, onDeleteBooking, onRefresh, error }) => {
+    const { authFetch } = useAuth();
     const [filter, setFilter] = useState('all');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState(''); // Добавляем состояние для успешных сообщений
+    const [localError, setLocalError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+    console.log('📋 BookingManagement received:', { bookingsCount: bookings.length });
 
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm('Вы уверены, что хотите отменить запись?')) {
             try {
                 setLoading(true);
-                setError('');
-                setSuccessMessage(''); // Очищаем предыдущие сообщения
+                setLocalError('');
+                setSuccessMessage('');
 
                 console.log('🗑️ Deleting booking:', bookingId);
 
-                const response = await fetch(`http://localhost:5002/api/bookings/${bookingId}`, {
+                const response = await authFetch(`http://localhost:5002/api/bookings/${bookingId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
                 });
 
                 console.log('📡 Delete response status:', response.status);
@@ -34,21 +35,18 @@ const BookingManagement = ({ bookings, onDeleteBooking, onRefresh }) => {
                 const result = await response.json();
                 console.log('✅ Delete result:', result);
 
-                // Показываем успешное сообщение
                 setSuccessMessage('✅ Запись успешно удалена');
 
-                // Автоматически скрываем сообщение через 3 секунды
                 setTimeout(() => {
                     setSuccessMessage('');
                 }, 3000);
 
-                // Обновляем список бронирований
                 onRefresh();
                 return true;
 
             } catch (error) {
                 console.error('❌ Delete error:', error);
-                setError(`❌ Ошибка при удалении: ${error.message}`);
+                setLocalError(`❌ Ошибка при удалении: ${error.message}`);
                 return false;
             } finally {
                 setLoading(false);
@@ -59,10 +57,9 @@ const BookingManagement = ({ bookings, onDeleteBooking, onRefresh }) => {
 
     const handleRefresh = () => {
         setLoading(true);
-        setError('');
+        setLocalError('');
         setSuccessMessage('');
         onRefresh();
-        // Загрузка закончится когда onRefresh завершится
         setTimeout(() => setLoading(false), 1000);
     };
 
@@ -107,9 +104,9 @@ const BookingManagement = ({ bookings, onDeleteBooking, onRefresh }) => {
                 )}
 
                 {/* Показываем ошибку */}
-                {error && (
+                {localError && (
                     <div className={styles.errorMessage}>
-                        {error}
+                        {localError}
                     </div>
                 )}
 
