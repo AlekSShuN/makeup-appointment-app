@@ -1,95 +1,94 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import styles from './AdminLogin.module.css';
 
 const AdminLogin = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const { login, isLoading } = useAuth();
+    const [formData, setFormData] = useState({
+        username: '',
+        password: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const { login } = useAuth();
     const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
-        const result = await login({ username, password });
-        if (result.success) {
-            navigate('/admin');
-        } else {
-            alert(result.error || 'Ошибка входа');
+        console.log('🔄 Отправка формы входа...');
+
+        try {
+            const result = await login(formData);
+            console.log('📨 Ответ от сервера:', result);
+
+            if (result.success) {
+                console.log('🎉 Вход успешен!');
+                navigate('/admin');
+            } else {
+                alert(result.error || 'Не удалось войти');
+            }
+        } catch (error) {
+            console.error('💥 Ошибка:', error);
+            alert('Произошла ошибка при входе');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <div style={{
-            padding: '50px',
-            maxWidth: '400px',
-            margin: '0 auto',
-            minHeight: '60vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
-        }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>
-                Вход в админ-панель
-            </h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '20px' }}>
-                    <input
-                        type="text"
-                        placeholder="Логин"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            fontSize: '16px'
-                        }}
-                        required
-                    />
+        <div className={styles.container}>
+            <div className={styles.loginCard}>
+                <h2 className={styles.title}>
+                    Вход для администратора
+                </h2>
+
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className={styles.input}
+                            placeholder="Введите логин"
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.inputGroup}>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={styles.input}
+                            placeholder="Введите пароль"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={styles.submitButton}
+                    >
+                        {isSubmitting ? 'Вход...' : 'Войти'}
+                    </button>
+                </form>
+
+                <div className={styles.demoHint}>
+                    Введите ваши учетные данные для входа в панель администратора
                 </div>
-                <div style={{ marginBottom: '20px' }}>
-                    <input
-                        type="password"
-                        placeholder="Пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            fontSize: '16px'
-                        }}
-                        required
-                    />
-                </div>
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    style={{
-                        width: '100%',
-                        padding: '12px',
-                        background: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        fontSize: '16px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    {isLoading ? 'Вход...' : 'Войти'}
-                </button>
-            </form>
-            <p style={{
-                marginTop: '20px',
-                fontSize: '14px',
-                color: '#666',
-                textAlign: 'center'
-            }}>
-                Для демо используйте любой логин и пароль
-            </p>
+            </div>
         </div>
     );
 };
