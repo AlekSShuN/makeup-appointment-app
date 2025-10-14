@@ -17,7 +17,6 @@ console.log('🔧 Telegram bot configuration check:', {
 });
 
 export const sendTelegramNotification = async (bookingData, service) => {
-    // Проверка конфигураций
     if (!token || !adminChatId) {
         console.log('❌ Telegram bot not configured - missing token or chat ID');
         console.log('   Token:', token ? 'SET' : 'MISSING');
@@ -29,7 +28,7 @@ export const sendTelegramNotification = async (bookingData, service) => {
         const message = `
 🎉 Новая запись!
 
-Услуга: ${service?.title || 'Не указана'}
+Услуга: ${service?.name || 'Не указана'}
 Дата: ${bookingData.date}
 Время: ${bookingData.time}
 

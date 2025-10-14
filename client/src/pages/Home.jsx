@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import styles from './Home.module.css';
-import Header from '../component/Header/Header.jsx';
+
 
 const SLIDE_INTERVAL = 4000;
 
@@ -14,9 +14,9 @@ const Home = () => {
         { image: "/slider/slider1.JPG", alt: "Вечерний макияж" },
         { image: "/slider/slider2.JPG", alt: "Свадебный макияж" },
         { image: "/slider/slider3.JPG", alt: "Дневной макияж" },
-        { image: "/slider/slider4.JPG", alt: "Макияж" },
-        { image: "/slider/slider5.JPG", alt: "Макияж" },
         { image: "/slider/slider6.JPG", alt: "Макияж" },
+        { image: "/slider/slider4.jpg", alt: "Макияж" },
+        { image: "/slider/slider5.jpg", alt: "Макияж" },
     ];
 
     const preloadImages = useCallback(async () => {
@@ -87,8 +87,6 @@ const Home = () => {
 
     return (
         <div className={styles.home}>
-            <Header />
-
             <section ref={(el) => addSectionRef(el, 0)} className={styles.hero}>
                 <div className={styles.heroBackground}>
                     <img
@@ -102,10 +100,10 @@ const Home = () => {
                 <div className={styles.heroContent}>
                     <div className={styles.heroText}>
                         <h1 className={styles.heroTitle}>
-                            Профессиональный визажист
+                            Визажист / hair-стилист
                         </h1>
                         <p className={styles.heroSubtitle}>
-                            Создаю идеальные образы, которые подчеркивают вашу естественную красоту
+                            Красота-это сила, а макияж то, что действительно её подчеркивает. Это женский секрет.
                         </p>
                         <div className={styles.heroButtons}>
                             <a href="/services" className={styles.heroButtonPrimary}>
