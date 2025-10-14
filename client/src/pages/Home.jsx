@@ -3,13 +3,6 @@ import styles from './Home.module.css';
 import Header from '../component/Header/Header.jsx';
 
 const SLIDE_INTERVAL = 4000;
-const PARTICLE_COUNT = 15;
-const PARTICLE_CONFIG = {
-    minSize: 4,
-    maxSize: 12,
-    minDuration: 15,
-    maxDuration: 25
-};
 
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -18,28 +11,13 @@ const Home = () => {
     const observerRef = useRef(null);
 
     const slides = [
-        { image: "/slider/slider6.PNG", alt: "Вечерний макияж" },/*
+        { image: "/slider/slider1.JPG", alt: "Вечерний макияж" },
         { image: "/slider/slider2.JPG", alt: "Свадебный макияж" },
         { image: "/slider/slider3.JPG", alt: "Дневной макияж" },
-        { image: "/slider/slider1.JPG", alt: "Smoky eyes" },
-        { image: "/slider/slider2.JPG", alt: "Натуральный макияж" }*/
+        { image: "/slider/slider4.JPG", alt: "Макияж" },
+        { image: "/slider/slider5.JPG", alt: "Макияж" },
+        { image: "/slider/slider6.JPG", alt: "Макияж" },
     ];
-
-    const createParticles = useCallback(() => {
-        const particles = [];
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            particles.push({
-                id: i,
-                size: Math.random() * (PARTICLE_CONFIG.maxSize - PARTICLE_CONFIG.minSize) + PARTICLE_CONFIG.minSize,
-                left: Math.random() * 100,
-                delay: Math.random() * 15,
-                duration: Math.random() * (PARTICLE_CONFIG.maxDuration - PARTICLE_CONFIG.minDuration) + PARTICLE_CONFIG.minDuration
-            });
-        }
-        return particles;
-    }, []);
-
-    const particles = createParticles();
 
     const preloadImages = useCallback(async () => {
         const promises = slides.map(slide => {
@@ -111,22 +89,7 @@ const Home = () => {
         <div className={styles.home}>
             <Header />
 
-            {particles.map(particle => (
-                <div
-                    key={particle.id}
-                    className={styles.floatingParticle}
-                    style={{
-                        width: particle.size,
-                        height: particle.size,
-                        left: `${particle.left}%`,
-                        animationDelay: `${particle.delay}s`,
-                        animationDuration: `${particle.duration}s`
-                    }}
-                />
-            ))}
-
-            <section
-                ref={(el) => addSectionRef(el, 0)} className={styles.hero}>
+            <section ref={(el) => addSectionRef(el, 0)} className={styles.hero}>
                 <div className={styles.heroBackground}>
                     <img
                         src={slides[currentSlide].image}
@@ -148,30 +111,14 @@ const Home = () => {
                             <a href="/services" className={styles.heroButtonPrimary}>
                                 Записаться
                             </a>
-                            <a href="/portfolio" className={styles.heroButtonSecondary}>
-                                Портфолио
-                            </a>
                         </div>
                     </div>
                 </div>
-
-                <div className={styles.heroSliderDots}>
-                    {slides.map((_, index) => (
-                        <button
-                            key={index}
-                            className={`${styles.sliderDot} ${index === currentSlide ? styles.active : ''}`}
-                            onClick={() => setCurrentSlide(index)}
-                        />
-                    ))}
-                </div>
             </section>
 
-
-
-            <section
-                ref={(el) => addSectionRef(el, 1)} className={styles.featuredServices}>
+            <section ref={(el) => addSectionRef(el, 1)} className={styles.featuredServices}>
                 <div className={styles.container}>
-                    <h2 className={styles.section_title}>Популярные услуги</h2>
+                    <h2 className={styles.sectionTitle}>Популярные услуги</h2>
                     <div className={styles.servicesGrid}>
                         <a href="/services#wedding" className={styles.serviceCard}>
                             <div className={styles.imageContainer}>
@@ -182,7 +129,7 @@ const Home = () => {
                                 />
                             </div>
                             <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}> Свадебный образ</h3>
+                                <h3 className={styles.serviceTitle}>Свадебный образ</h3>
                                 <p className={styles.price}>6 000 ₽</p>
                                 <span className={styles.serviceDesc}>Идеальный образ для самого важного дня</span>
                             </div>
@@ -197,7 +144,7 @@ const Home = () => {
                                 />
                             </div>
                             <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}> Вечерний макияж</h3>
+                                <h3 className={styles.serviceTitle}>Вечерний макияж</h3>
                                 <p className={styles.price}>2 300 ₽</p>
                                 <span className={styles.serviceDesc}>Для особых мероприятий и выходов</span>
                             </div>
@@ -212,7 +159,7 @@ const Home = () => {
                                 />
                             </div>
                             <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}> Урок макияжа для себя</h3>
+                                <h3 className={styles.serviceTitle}>Урок макияжа для себя</h3>
                                 <p className={styles.price}>4 500 ₽</p>
                                 <span className={styles.serviceDesc}>Научимся создавать идеальный образ</span>
                             </div>
@@ -228,14 +175,14 @@ const Home = () => {
                             <img src="/images/services/miss_nadya.JPG" alt="Визажист Надежда" />
                         </div>
                         <div className={styles.aboutText}>
-                            <h2 className={styles.section_title}>Обо мне</h2>
+                            <h2 className={styles.sectionTitle}>Обо мне</h2>
                             <h3 className={styles.aboutSubtitle}>Ваш стилист Надежда</h3>
                             <p className={styles.aboutParagraph}>В сфере красоты с 2020 года. Я убеждена, что макияж — это инструмент, который подчеркивает вашу уникальность, а не скрывает ее.</p>
                             <p className={styles.aboutParagraph}>Каждый год я прохожу повышение квалификации и изучаю новые техники, чтобы предлагать вам самые актуальные и современные решения.</p>
-                            <ul className={styles.achivmentsList}>
-                                <li className={styles.achivmentItem}> Сертифицированный специалист по технике air-makeup</li>
-                                <li className={styles.achivmentItem}> Опыт работы на съемках для журналов</li>
-                                <li className={styles.achivmentItem}> Более 300 довольных клиентов</li>
+                            <ul className={styles.achievementsList}>
+                                <li className={styles.achievementItem}>Сертифицированный специалист по технике air-makeup</li>
+                                <li className={styles.achievementItem}>Опыт работы на съемках для журналов</li>
+                                <li className={styles.achievementItem}>Более 300 довольных клиентов</li>
                             </ul>
                         </div>
                     </div>
@@ -244,7 +191,7 @@ const Home = () => {
 
             <section ref={(el) => addSectionRef(el, 3)} className={styles.testimonials}>
                 <div className={styles.container}>
-                    <h2 className={styles.section_title}>Отзывы клиентов</h2>
+                    <h2 className={styles.sectionTitle}>Отзывы клиентов</h2>
                     <div className={styles.testimonialsGrid}>
                         <div className={styles.testimonialCard}>
                             <div className={styles.quoteIcon}>❝</div>

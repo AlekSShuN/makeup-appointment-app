@@ -1,144 +1,110 @@
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const envPath = path.join(__dirname, '.env');
-console.log('🔧 Loading .env from:', envPath);
-
-dotenv.config({ path: envPath });
+dotenv.config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const chatId = process.env.TELEGRAM_CHAT_ID;
+const adminChatId = process.env.TELEGRAM_CHAT_ID;
 
-console.log('🔧 Telegram config check:', {
+console.log('🔧 Telegram bot configuration check:', {
     hasToken: !!token,
-    hasChatId: !!chatId,
     tokenLength: token?.length,
-    chatId: chatId,
-    allEnvKeys: Object.keys(process.env).filter(key => key.includes('TELEGRAM'))
+    hasChatId: !!adminChatId,
+    chatId: adminChatId
 });
 
-let bot;
-
-if (token && chatId) {
-    bot = new TelegramBot(token, { polling: false });
-    console.log('✅ Telegram bot initialized');
-} else {
-    console.warn('⚠️ Telegram bot not configured - missing token or chat ID');
-    console.warn('Current working directory:', process.cwd());
-}
-
 export const sendTelegramNotification = async (bookingData, service) => {
-    console.log('🔧 sendTelegramNotification called with:', {
-        hasBot: !!bot,
-        hasChatId: !!chatId,
-        bookingId: bookingData.bookingId
-    });
+    // ✅ ПРАВИЛЬНАЯ ПРОВЕРКА КОНФИГУРАЦИИ
+    if (!token || !adminChatId) {
+        console.log('❌ Telegram bot not configured - missing token or chat ID');
+        console.log('   Token:', token ? 'SET' : 'MISSING');
+        console.log('   Chat ID:', adminChatId ? 'SET' : 'MISSING');
+        return;
+    }
 
-    if (!bot || !chatId) {
-        console.warn('❌ Telegram bot not configured - cannot send notification');
-        return false;
+    // ✅ ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ФОРМАТА ТОКЕНА
+    if (!token.includes(':')) {
+        console.log('❌ Invalid Telegram token format');
+        return;
     }
 
     try {
+        const bot = new TelegramBot(token);
+
         const message = `
-🎉 *НОВАЯ ЗАПИСЬ*
+🎉 Новая запись!
 
-*Услуга:* ${service?.name || 'Не указана'}
-*Цена:* ${service?.price || 'Не указана'} руб.
-*Длительность:* ${service?.duration || 'Не указана'} мин.
+Услуга: ${service?.title || 'Не указана'}
+Дата: ${bookingData.date}
+Время: ${bookingData.time}
 
-*Дата:* ${bookingData.date}
-*Время:* ${bookingData.time}
+Клиент:
+Имя: ${bookingData.client.name}
+Телефон: ${bookingData.client.phone}
+${bookingData.client.comment ? `Комментарий: ${bookingData.client.comment}` : ''}
 
-*Клиент:*
-👤 ${bookingData.client.name}
-📞 ${bookingData.client.phone}
-${bookingData.client.comment ? `💬 ${bookingData.client.comment}` : ''}
+ID записи: ${bookingData.bookingId}
+        `;
 
-*ID записи:* ${bookingData.bookingId}
-        `.trim();
+        console.log('📤 Attempting to send Telegram message...');
+        console.log('   To chat ID:', adminChatId);
+        console.log('   Message length:', message.length);
 
-        console.log('📤 Sending Telegram message to chat ID:', chatId);
-        const result = await bot.sendMessage(chatId, message, {
-            parse_mode: 'Markdown',
-            disable_notification: false
-        });
+        await bot.sendMessage(adminChatId, message);
+        console.log('✅ Telegram notification sent successfully!');
 
-        console.log('✅ Telegram notification sent successfully, message ID:', result.message_id);
-        return true;
     } catch (error) {
-        console.error('❌ Error sending Telegram notification:', error.message);
-        return false;
+        console.error('❌ Failed to send Telegram notification:', error.message);
+
+        // ✅ ПОДРОБНАЯ ДИАГНОСТИКА ОШИБОК
+        if (error.response?.body) {
+            const errorBody = error.response.body;
+            console.error('📋 Telegram API error:', {
+                description: errorBody.description,
+                error_code: errorBody.error_code
+            });
+
+            // Частые ошибки и их решения
+            if (errorBody.error_code === 401) {
+                console.error('💡 Solution: Check if Telegram token is correct');
+            } else if (errorBody.error_code === 400) {
+                console.error('💡 Solution: Check if chat ID is correct and bot was started with /start');
+            } else if (errorBody.error_code === 403) {
+                console.error('💡 Solution: User blocked the bot');
+            }
+        }
     }
 };
 
-//Напоминание за день
-export const sendReminder = async (booking) => {
-    if (!bot || !chatId) {
-        console.warn('Telegram bot not configured');
-        return false;
+// ✅ УПРОЩЕННАЯ ВЕРСИЯ БОТА ДЛЯ КОМАНД
+export const setupAdminBot = () => {
+    if (!token || !adminChatId) {
+        console.log('❌ Telegram bot not configured - skipping bot setup');
+        return;
     }
 
     try {
-        const message = `
-⏰ *НАПОМИНАНИЕ О ЗАПИСИ*
+        const bot = new TelegramBot(token, { polling: true });
+        console.log('✅ Telegram bot started with commands support');
 
-Завтра в ${booking.time} у вас запись!
+        bot.onText(/\/start/, (msg) => {
+            const chatId = msg.chat.id.toString();
 
-*Клиент:* ${booking.client.name}
-*Телефон:* ${booking.client.phone}
-*Услуга:* ${booking.service?.name || 'Не указана'}
-*ID записи:* ${booking.bookingId}
-        `.trim();
+            if (chatId !== adminChatId) {
+                bot.sendMessage(chatId, '❌ Этот бот только для администратора.');
+                console.log(`🚫 Unauthorized access attempt from: ${chatId}`);
+                return;
+            }
 
-        await bot.sendMessage(chatId, message, {
-            parse_mode: 'Markdown',
-            disable_notification: false
+            bot.sendMessage(chatId, '👋 Бот уведомлений запущен! Вы будете получать уведомления о новых записях.');
+            console.log(`✅ Admin started the bot: ${chatId}`);
         });
 
-        console.log('✅ Telegram reminder sent');
-        return true;
-    } catch (error) {
-        console.error('❌ Error sending Telegram reminder:', error);
-        return false;
-    }
-};
-
-//Отмена записи
-export const sendCancellation = async (booking) => {
-    if (!bot || !chatId) {
-        console.warn('Telegram bot not configured');
-        return false;
-    }
-
-    try {
-        const message = `
-❌ *ЗАПИСЬ ОТМЕНЕНА*
-
-*Дата:* ${booking.date}
-*Время:* ${booking.time}
-*Клиент:* ${booking.client.name}
-*Телефон:* ${booking.client.phone}
-*Услуга:* ${booking.service?.name || 'Не указана'}
-*ID записи:* ${booking.bookingId}
-        `.trim();
-
-        await bot.sendMessage(chatId, message, {
-            parse_mode: 'Markdown',
-            disable_notification: false
+        bot.on('polling_error', (error) => {
+            console.error('❌ Telegram polling error:', error.message);
         });
 
-        console.log('✅ Telegram cancellation sent');
-        return true;
     } catch (error) {
-        console.error('❌ Error sending Telegram cancellation:', error);
-        return false;
+        console.error('❌ Failed to setup Telegram bot:', error.message);
     }
 };
-
-export default bot;
