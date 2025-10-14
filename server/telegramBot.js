@@ -1,10 +1,13 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminChatId = process.env.TELEGRAM_CHAT_ID;
+
+// Экземпляр бота
+const bot = new Telegraf(token);
 
 console.log('🔧 Telegram bot configuration check:', {
     hasToken: !!token,
@@ -14,7 +17,7 @@ console.log('🔧 Telegram bot configuration check:', {
 });
 
 export const sendTelegramNotification = async (bookingData, service) => {
-    // ✅ ПРАВИЛЬНАЯ ПРОВЕРКА КОНФИГУРАЦИИ
+    // Проверка конфигураций
     if (!token || !adminChatId) {
         console.log('❌ Telegram bot not configured - missing token or chat ID');
         console.log('   Token:', token ? 'SET' : 'MISSING');
@@ -22,15 +25,7 @@ export const sendTelegramNotification = async (bookingData, service) => {
         return;
     }
 
-    // ✅ ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ФОРМАТА ТОКЕНА
-    if (!token.includes(':')) {
-        console.log('❌ Invalid Telegram token format');
-        return;
-    }
-
     try {
-        const bot = new TelegramBot(token);
-
         const message = `
 🎉 Новая запись!
 
@@ -50,33 +45,29 @@ ID записи: ${bookingData.bookingId}
         console.log('   To chat ID:', adminChatId);
         console.log('   Message length:', message.length);
 
-        await bot.sendMessage(adminChatId, message);
+        await bot.telegram.sendMessage(adminChatId, message);
         console.log('✅ Telegram notification sent successfully!');
 
     } catch (error) {
         console.error('❌ Failed to send Telegram notification:', error.message);
 
-        // ✅ ПОДРОБНАЯ ДИАГНОСТИКА ОШИБОК
-        if (error.response?.body) {
-            const errorBody = error.response.body;
+        if (error.response) {
             console.error('📋 Telegram API error:', {
-                description: errorBody.description,
-                error_code: errorBody.error_code
+                description: error.response.description,
+                error_code: error.response.error_code
             });
 
-            // Частые ошибки и их решения
-            if (errorBody.error_code === 401) {
+            if (error.response.error_code === 401) {
                 console.error('💡 Solution: Check if Telegram token is correct');
-            } else if (errorBody.error_code === 400) {
-                console.error('💡 Solution: Check if chat ID is correct and bot was started with /start');
-            } else if (errorBody.error_code === 403) {
+            } else if (error.response.error_code === 400) {
+                console.error('💡 Solution: Check if chat ID is correct');
+            } else if (error.response.error_code === 403) {
                 console.error('💡 Solution: User blocked the bot');
             }
         }
     }
 };
 
-// ✅ УПРОЩЕННАЯ ВЕРСИЯ БОТА ДЛЯ КОМАНД
 export const setupAdminBot = () => {
     if (!token || !adminChatId) {
         console.log('❌ Telegram bot not configured - skipping bot setup');
@@ -84,27 +75,31 @@ export const setupAdminBot = () => {
     }
 
     try {
-        const bot = new TelegramBot(token, { polling: true });
-        console.log('✅ Telegram bot started with commands support');
+        console.log('✅ Telegram bot started with Telegraf');
 
-        bot.onText(/\/start/, (msg) => {
-            const chatId = msg.chat.id.toString();
+        bot.start((ctx) => {
+            const chatId = ctx.chat.id.toString();
 
             if (chatId !== adminChatId) {
-                bot.sendMessage(chatId, '❌ Этот бот только для администратора.');
+                ctx.reply('❌ Этот бот только для администратора.');
                 console.log(`🚫 Unauthorized access attempt from: ${chatId}`);
                 return;
             }
 
-            bot.sendMessage(chatId, '👋 Бот уведомлений запущен! Вы будете получать уведомления о новых записях.');
+            ctx.reply('👋 Бот уведомлений запущен! Вы будете получать уведомления о новых записях.');
             console.log(`✅ Admin started the bot: ${chatId}`);
         });
-
-        bot.on('polling_error', (error) => {
-            console.error('❌ Telegram polling error:', error.message);
+        bot.launch().then(() => {
+            console.log('🤖 Telegram bot is running with Telegraf');
+        });
+        bot.catch((error) => {
+            console.error('❌ Telegram bot error:', error);
         });
 
     } catch (error) {
         console.error('❌ Failed to setup Telegram bot:', error.message);
     }
 };
+
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
