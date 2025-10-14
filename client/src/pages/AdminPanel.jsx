@@ -85,18 +85,15 @@ const AdminPanel = () => {
         fetchBookings();
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/admin-login';
+    };
+
     // ✅ Показываем загрузку
     if (authLoading || isLoading) {
         return (
-            <div style={{
-                padding: '50px',
-                textAlign: 'center',
-                minHeight: '50vh',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
+            <div className={styles.loadingContainer}>
                 <h2>Загрузка...</h2>
                 <p>Пожалуйста, подождите</p>
             </div>
@@ -106,29 +103,10 @@ const AdminPanel = () => {
     // ✅ Если не авторизован
     if (!isAuthenticated) {
         return (
-            <div style={{
-                padding: '50px',
-                textAlign: 'center',
-                minHeight: '50vh',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
+            <div className={styles.authRequiredContainer}>
                 <h2>Требуется авторизация</h2>
                 <p>Для доступа к панели управления необходимо войти в систему.</p>
-                <a
-                    href="/admin-login"
-                    style={{
-                        display: 'inline-block',
-                        padding: '10px 20px',
-                        background: '#007bff',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '4px',
-                        marginTop: '20px'
-                    }}
-                >
+                <a href="/admin-login" className={styles.loginButton}>
                     Войти в систему
                 </a>
             </div>
@@ -188,23 +166,13 @@ const AdminPanel = () => {
                 <div className={styles.adminContent}>
                     <div className={styles.contentWrapper}>
                         <header className={styles.adminHeader}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className={styles.headerContent}>
                                 <h1 className={styles.adminTitle}>Панель управления</h1>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <div className={styles.userInfo}>
                                     <span>Администратор: <strong>{user?.username}</strong></span>
                                     <button
-                                        onClick={() => {
-                                            localStorage.removeItem('admin_token');
-                                            window.location.href = '/admin-login';
-                                        }}
-                                        style={{
-                                            padding: '5px 10px',
-                                            background: '#dc3545',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
+                                        onClick={handleLogout}
+                                        className={styles.logoutButton}
                                     >
                                         Выйти
                                     </button>
@@ -223,24 +191,11 @@ const AdminPanel = () => {
                         </header>
 
                         {error && (
-                            <div style={{
-                                background: '#ffebee',
-                                color: '#c62828',
-                                padding: '15px',
-                                borderRadius: '4px',
-                                marginBottom: '20px',
-                                border: '1px solid #f5c6cb'
-                            }}>
+                            <div className={styles.errorAlert}>
                                 <strong>Ошибка:</strong> {error}
                                 <button
                                     onClick={() => setError('')}
-                                    style={{
-                                        float: 'right',
-                                        background: 'none',
-                                        border: 'none',
-                                        fontSize: '18px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className={styles.errorCloseButton}
                                 >
                                     ×
                                 </button>
@@ -248,26 +203,12 @@ const AdminPanel = () => {
                         )}
 
                         {bookings.length === 0 && !isLoading && (
-                            <div style={{
-                                background: '#e7f3ff',
-                                color: '#0066cc',
-                                padding: '20px',
-                                borderRadius: '4px',
-                                textAlign: 'center',
-                                marginBottom: '20px'
-                            }}>
+                            <div className={styles.emptyState}>
                                 <h3>Записей нет</h3>
                                 <p>На данный момент нет активных бронирований.</p>
                                 <button
                                     onClick={handleRefresh}
-                                    style={{
-                                        padding: '8px 16px',
-                                        background: '#007bff',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className={styles.refreshButton}
                                 >
                                     Обновить
                                 </button>

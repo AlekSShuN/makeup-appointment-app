@@ -47,6 +47,51 @@
     margin: 0;
 }
 
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logoutButton {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.logoutButton:hover {
+    background: linear-gradient(135deg, #e5568b 0%, #ff7a9c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+}
+
+.logoutButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(255, 107, 157, 0.3);
+}
+
+.statsContainer {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 1rem;
+}
+
 .statsCard {
     background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
     padding: 1.5rem 2rem;
@@ -54,6 +99,23 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 107, 157, 0.1);
     flex-shrink: 0;
+    text-align: center;
+    min-width: 140px;
+    flex: 1;
+}
+
+.statsNumber {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 4px;
+}
+
+.statsLabel {
+    display: block;
+    font-size: 14px;
+    color: #666;
 }
 
 .statsText {
@@ -78,6 +140,109 @@
     width: 100%;
     max-width: 100%;
     padding-top: 1rem;
+}
+
+.loadingContainer {
+    padding: 50px;
+    text-align: center;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.authRequiredContainer {
+    padding: 50px;
+    text-align: center;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginButton {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.loginButton:hover {
+    background: #0056b3;
+}
+
+.errorAlert {
+    background: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb;
+    position: relative;
+}
+
+.errorCloseButton {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #c62828;
+}
+
+.emptyState {
+    background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+    color: #2c3e50;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 107, 157, 0.1);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.emptyState h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.emptyState p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+.refreshButton {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.refreshButton:hover {
+    background: linear-gradient(135deg, #e5568b 0%, #ff7a9c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+}
+
+.refreshButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(255, 107, 157, 0.3);
 }
 
 .filters {
@@ -139,38 +304,7 @@
     margin: 0 auto 16px;
 }
 
-.statsContainer {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.statsCard {
-    background: white;
-    padding: 16px 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-    text-align: center;
-    min-width: 140px;
-    flex: 1;
-    min-width: 120px;
-}
-
-.statsNumber {
-    display: block;
-    font-size: 24px;
-    font-weight: bold;
-    color: #007bff;
-    margin-bottom: 4px;
-}
-
-.statsLabel {
-    display: block;
-    font-size: 14px;
-    color: #666;
-}
-
+/*Анимации*/
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -193,7 +327,7 @@
     }
 }
 
-/* Адаптивность*/
+/* Адаптивность */
 @media (max-width: 1024px) {
     .adminContent {
         margin-left: 220px;
@@ -248,6 +382,17 @@
         text-align: center;
     }
 
+    .headerContent {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .userInfo {
+        flex-direction: column;
+        gap: 10px;
+    }
+
     .adminTitle {
         font-size: 1.8rem;
         text-align: center;
@@ -283,6 +428,36 @@
         flex: 1;
         min-width: 120px;
         text-align: center;
+    }
+
+    .loadingContainer,
+    .authRequiredContainer {
+        padding: 30px 20px;
+        min-height: 40vh;
+    }
+
+    .logoutButton {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .emptyState {
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .emptyState h3 {
+        font-size: 1.3rem;
+    }
+
+    .emptyState p {
+        font-size: 0.9rem;
+    }
+
+    .refreshButton {
+        padding: 10px 20px;
+        font-size: 13px;
     }
 }
 
@@ -342,6 +517,8 @@
         flex: 1;
     }
 
+    .errorAlert,
+    .emptyState,
     .errorMessage,
     .successMessage {
         padding: 12px;
@@ -353,6 +530,37 @@
         width: 32px;
         height: 32px;
         border-width: 3px;
+    }
+
+    .loadingContainer,
+    .authRequiredContainer {
+        padding: 20px 15px;
+        min-height: 30vh;
+    }
+
+    .logoutButton {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .emptyState {
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1.25rem;
+    }
+
+    .emptyState h3 {
+        font-size: 1.2rem;
+    }
+
+    .emptyState p {
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .refreshButton {
+        padding: 8px 16px;
+        font-size: 12px;
     }
 }
 
@@ -395,5 +603,11 @@
 
     .sectionContent {
         padding: 1rem;
+    }
+
+    .loadingContainer,
+    .authRequiredContainer {
+        min-height: 30vh;
+        padding: 20px;
     }
 }

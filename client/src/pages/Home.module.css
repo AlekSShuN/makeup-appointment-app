@@ -11,6 +11,7 @@
     position: relative;
     height: 100vh;
     min-height: 600px;
+    max-height: 1200px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,7 +23,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 120vh;
     z-index: 0;
 }
 
@@ -34,8 +35,9 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    object-position: center center;
+    object-position: center top;
     transform: translate(-50%, -50%);
+    transition: opacity 1s ease-in-out;
 }
 
 .heroOverlay {
@@ -55,61 +57,64 @@
     max-width: 1400px;
     width: 100%;
     padding: 0 2rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
     position: relative;
     z-index: 2;
+    margin-top: 10vh;
 }
 
 .heroText {
     color: white;
-    max-width: 600px;
+    max-width: 550px;
+    text-align: left;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     opacity: 0;
-    transform: translateX(-50px);
-    animation: slideInLeft 0.8s ease-out 0.3s forwards;
+    transform: translateY(30px);
+    animation: slideInUp 0.8s ease-out 0.3s forwards;
+    margin-left: 5%;
 }
 
 .heroTitle {
-    font-size: clamp(2.2rem, 5vw, 3.2rem);
-    font-weight: 700;
-    margin-bottom: 1.2rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 600;
+    margin-bottom: 1rem;
     background: linear-gradient(135deg, #f8f8f8 20%, #ffffff 150%);
     -webkit-background-clip: text;
     background-clip: text;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .heroSubtitle {
-    font-size: 1.3rem;
+    font-size: clamp(1rem, 2.2vw, 1.3rem);
     line-height: 1.6;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     opacity: 0.95;
     font-weight: 300;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .heroButtons {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .heroButtonPrimary {
     background: linear-gradient(45deg, #e91e63, #ff4081);
     color: white;
-    padding: 1rem 2rem;
+    padding: 0.8rem 2rem;
     border-radius: 50px;
     text-decoration: none;
+    text-align: center;
     font-weight: 600;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    text-shadow: none;
     box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+    font-size: 1.5rem;
+    width: 300px;
 }
 
 .heroButtonPrimary:hover {
@@ -120,14 +125,13 @@
 .heroButtonSecondary {
     background: transparent;
     color: white;
-    padding: 1rem 2rem;
+    padding: 0.8rem 2rem;
     border-radius: 50px;
     text-decoration: none;
     font-weight: 600;
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
     transition: all 0.3s ease;
-    text-shadow: none;
-    backdrop-filter: blur(10px);
+    font-size: 1.1rem;
 }
 
 .heroButtonSecondary:hover {
@@ -136,82 +140,17 @@
     transform: translateY(-2px);
 }
 
-.heroFeatures {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    padding: 2.5rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transform: translateX(50px);
-    animation: slideInRight 0.8s ease-out 0.6s forwards;
-}
-
-.featureItem {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 500;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-.featureIcon {
-    font-size: 1.8rem;
-    width: 50px;
-    text-align: center;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.heroSliderDots {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 0.8rem;
-    z-index: 3;
-}
-
-.sliderDot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid white;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.sliderDot.active {
-    background: white;
-    transform: scale(1.3);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-}
-
-.sliderDot:hover {
-    background: rgba(255, 255, 255, 0.7);
-}
-
 /* Common Sections */
 .container {
     margin: 0 auto;
     padding: 0 20px;
-    text-align: center;
     max-width: 1200px;
 }
 
-.section_title {
+.sectionTitle {
     font-size: clamp(2.2rem, 5vw, 3.2rem);
     font-weight: 700;
     margin-bottom: 1.2rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #2c3e50 0%, #ff6b9d 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -219,11 +158,10 @@
     line-height: 1.2;
     text-align: center;
     position: relative;
-    animation: titleSlide 0.8s ease-out;
     padding-bottom: 30px;
 }
 
-.section_title::after {
+.sectionTitle::after {
     content: '';
     display: block;
     width: 80px;
@@ -234,7 +172,7 @@
     transition: width 0.3s ease;
 }
 
-.section_title:hover::after {
+.sectionTitle:hover::after {
     width: 120px;
 }
 
@@ -259,39 +197,21 @@
     text-decoration: none;
     color: inherit;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.6s ease;
-    transform: translateY(30px);
-    position: relative;
-    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 .serviceCard:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.serviceCard::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.7s ease;
-}
-
-.serviceCard:hover::before {
-    left: 100%;
 }
 
 .imageContainer {
     position: relative;
     width: 100%;
-    height: 340px;
+    height: 300px;
     overflow: hidden;
-    border-radius: 15px;
-    flex-shrink: 0;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
 }
 
 .serviceImage {
@@ -299,8 +219,7 @@
     height: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
-    background-color: #f8f9fa;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 .serviceCard:hover .serviceImage {
@@ -308,20 +227,19 @@
 }
 
 .serviceContent {
-    padding: 1.5rem;
+    padding: 0;
 }
 
 .serviceTitle {
     font-size: 1.3rem;
     font-weight: 600;
-    flex-grow: 1;
     color: #2c3e50;
     margin-bottom: 0.5rem;
 }
 
 .price {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #ff6b9d;
     margin-bottom: 0.5rem;
 }
@@ -329,33 +247,19 @@
 .serviceDesc {
     color: #666;
     line-height: 1.5;
-    display: block;
     font-size: 0.95rem;
-    margin-top: 0.5rem;
 }
 
 /* About Section */
 .about {
-    padding: 100px 0;
+    padding: 5rem 0;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.about::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 133, 162, 0.5), transparent);
 }
 
 .aboutContent {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5rem;
+    gap: 4rem;
     align-items: center;
 }
 
@@ -363,12 +267,9 @@
     width: 100%;
     max-width: 400px;
     height: 500px;
-    position: relative;
+    border-radius: 20px;
     overflow: hidden;
-    border-radius: 25px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    transform: rotate(-1deg);
-    transition: transform 0.5s ease;
     margin: 0 auto;
 }
 
@@ -376,15 +277,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.aboutImage:hover {
-    transform: rotate(0deg) scale(1.02);
-}
-
-.aboutImage:hover img {
-    transform: scale(1.05);
 }
 
 .aboutText {
@@ -403,16 +295,15 @@
     line-height: 1.7;
     color: #555;
     margin-bottom: 1rem;
-    text-align: justify;
 }
 
-.achivmentsList {
+.achievementsList {
     list-style: none;
     padding: 0;
     margin-top: 1.5rem;
 }
 
-.achivmentItem {
+.achievementItem {
     font-size: 1rem;
     color: #555;
     margin-bottom: 0.8rem;
@@ -420,7 +311,7 @@
     position: relative;
 }
 
-.achivmentItem::before {
+.achievementItem::before {
     content: '✓';
     position: absolute;
     left: 0;
@@ -475,388 +366,7 @@
     color: #2c3e50;
 }
 
-/* Адаптивность для планшетов (1024px и меньше) */
-@media (max-width: 1024px) {
-    .heroContent {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-    }
-
-    .heroText {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .heroFeatures {
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
-    .aboutContent {
-        gap: 3rem;
-    }
-
-    .servicesGrid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .testimonialsGrid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-}
-
-/* Адаптивность для средних планшетов (768px и меньше) */
-@media (max-width: 768px) {
-    .hero {
-        height: 90vh;
-        min-height: 500px;
-    }
-
-    .heroContent {
-        padding: 0 1.5rem;
-        gap: 2rem;
-    }
-
-    .heroTitle {
-        font-size: 2.5rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-    }
-
-    .heroButtons {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        width: 100%;
-        max-width: 280px;
-        text-align: center;
-    }
-
-    .heroFeatures {
-        padding: 1.5rem;
-        gap: 1rem;
-    }
-
-    .featureItem {
-        font-size: 1rem;
-    }
-
-    .featureIcon {
-        font-size: 1.5rem;
-        width: 40px;
-    }
-
-    .about {
-        padding: 60px 0;
-    }
-
-    .aboutContent {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        text-align: center;
-    }
-
-    .aboutText {
-        text-align: center;
-    }
-
-    .aboutParagraph {
-        text-align: center;
-    }
-
-    .aboutImage {
-        max-width: 300px;
-        height: 400px;
-        order: -1;
-    }
-
-    .featuredServices,
-    .testimonials {
-        padding: 3rem 0;
-    }
-
-    .servicesGrid,
-    .testimonialsGrid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .serviceCard,
-    .testimonialCard {
-        padding: 2rem;
-    }
-
-    .imageContainer {
-        height: 280px;
-    }
-
-    .container {
-        padding: 0 15px;
-    }
-}
-
-/* Адаптивность для мобильных устройств (480px и меньше) */
-@media (max-width: 480px) {
-    .hero {
-        min-height: 600px;
-        height: 100vh;
-    }
-
-    .heroContent {
-        padding: 0 1rem;
-    }
-
-    .heroTitle {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .heroButtons {
-        gap: 0.8rem;
-    }
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-    }
-
-    .heroFeatures {
-        padding: 1.2rem;
-    }
-
-    .featureItem {
-        font-size: 0.9rem;
-        gap: 0.8rem;
-    }
-
-    .featureIcon {
-        font-size: 1.3rem;
-        width: 35px;
-    }
-
-    .heroSliderDots {
-        bottom: 1rem;
-    }
-
-    .sliderDot {
-        width: 10px;
-        height: 10px;
-    }
-
-    .section_title {
-        font-size: 2rem;
-        padding-bottom: 20px;
-    }
-
-    .about {
-        padding: 40px 0;
-    }
-
-    .aboutImage {
-        max-width: 100%;
-        height: 350px;
-    }
-
-    .aboutSubtitle {
-        font-size: 1.3rem;
-    }
-
-    .aboutParagraph {
-        font-size: 1rem;
-        text-align: left;
-    }
-
-    .featuredServices,
-    .testimonials {
-        padding: 2rem 0;
-    }
-
-    .serviceCard,
-    .testimonialCard {
-        padding: 1.5rem;
-    }
-
-    .imageContainer {
-        height: 250px;
-    }
-
-    .serviceTitle {
-        font-size: 1.2rem;
-    }
-
-    .price {
-        font-size: 1.1rem;
-    }
-
-    .testimonialText {
-        font-size: 1rem;
-    }
-
-    .container {
-        padding: 0 10px;
-    }
-}
-
-/* Адаптивность для очень маленьких экранов (320px и меньше) */
-@media (max-width: 320px) {
-    .heroTitle {
-        font-size: 1.8rem;
-    }
-
-    .heroSubtitle {
-        font-size: 0.9rem;
-    }
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.85rem;
-    }
-
-    .section_title {
-        font-size: 1.8rem;
-    }
-
-    .serviceCard,
-    .testimonialCard {
-        padding: 1rem;
-    }
-
-    .imageContainer {
-        height: 200px;
-    }
-}
-
-/* Поддержка landscape ориентации на мобильных */
-@media (max-height: 700px) and (orientation: landscape) {
-    .hero {
-        height: auto;
-        min-height: 100vh;
-        padding: 4rem 0;
-    }
-
-    .heroContent {
-        gap: 2rem;
-    }
-
-    .heroTitle {
-        font-size: 2rem;
-    }
-
-    .heroSubtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-}
-
-/* Улучшенная поддержка touch устройств */
-@media (hover: none) and (pointer: coarse) {
-
-    .heroButtonPrimary,
-    .heroButtonSecondary {
-        padding: 12px 20px;
-        min-height: 44px;
-    }
-
-    .serviceCard,
-    .testimonialCard {
-        padding: 1.5rem;
-    }
-}
-
-/* Анимации */
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes titleSlide {
-    from {
-        opacity: 1;
-        transform: translateY(-30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes floatParticle {
-    0% {
-        transform: translateY(0) rotate(0deg) scale(1);
-        opacity: 1;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(-100vh) rotate(360deg) scale(1.5);
-        opacity: 1;
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Остальные стили остаются без изменений */
-.floatingParticle {
-    position: absolute;
-    background: linear-gradient(135deg, #ff85a2, #ff6b9d);
-    border-radius: 50%;
-    animation: floatParticle 15s infinite linear;
-    pointer-events: none;
-}
-
+/* Loading */
 .loadingScreen {
     position: fixed;
     top: 0;
@@ -891,33 +401,267 @@
     animation: spin 2s linear infinite reverse;
 }
 
-.imageFallback {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #ff6b9d, #ff85a2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.2rem;
+/* Адаптивность */
+
+
+
+@media (max-width: 1024px) {
+    .heroContent {
+        padding: 0 1.5rem;
+    }
+
+    .aboutContent {
+        gap: 3rem;
+    }
+
+    .servicesGrid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
 }
 
-.loadingText {
-    margin-top: 1rem;
-    color: #ff6b9d;
-    font-size: 1.1rem;
+
+
+@media (max-width: 768px) {
+
+    @media (max-width: 768px) {
+        .heroContent {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 3rem;
+        }
+
+        .heroText {
+            position: static;
+            text-align: center;
+            max-width: 90%;
+            margin: 0 auto 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.8s ease-out 0.3s forwards;
+        }
+
+        .heroButtons {
+            position: static;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .heroButtonPrimary,
+        .heroButtonSecondary {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .heroTitle {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .heroSubtitle {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+    }
+
+    .aboutContent {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .aboutText {
+        text-align: center;
+    }
+
+    .aboutImage {
+        max-width: 300px;
+        height: 400px;
+        order: -1;
+    }
+
+    .featuredServices,
+    .testimonials {
+        padding: 3rem 0;
+    }
+
+    .servicesGrid,
+    .testimonialsGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 2rem;
+    }
+
+    .imageContainer {
+        height: 200px;
+    }
 }
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+@media (max-width: 480px) {
+
+    .heroContent {
+        justify-content: space-between;
+        padding-top: 4rem;
+        padding-bottom: 2rem;
+    }
+
+    .heroText {
+        margin-top: -4rem;
+        margin-bottom: auto;
+    }
+
+    .heroButtons {
+        padding-top: 320px;
+        margin-bottom: 1rem;
+
+    }
+
+    .hero {
+        height: 70vh;
+        min-height: 400px;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        width: 100%;
+        max-width: 260px;
+        margin: 0 auto;
+    }
+
+    .heroTitle {
+        font-size: 1.7rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .heroSubtitle {
+        font-size: 0.95rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .heroSliderDots {
+        bottom: 1rem;
+    }
+
+    .sliderDot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .sectionTitle {
+        font-size: 2rem;
+        padding-bottom: 20px;
+    }
+
+    .about {
+        padding: 3rem 0;
+    }
+
+    .aboutImage {
+        height: 300px;
+    }
+
+    .featuredServices,
+    .testimonials {
+        padding: 2rem 0;
+    }
+
+    .serviceCard,
+    .testimonialCard {
+        padding: 1.5rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        height: 100vh;
+        min-height: 400px;
+    }
+
+    .heroContent {
+        padding: 2rem 1rem;
+    }
+
+    .heroTitle {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .heroSubtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .heroButtons {
+        gap: 0.5rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 375px) {
+    .heroTitle {
+        font-size: 1.3rem;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+        word-wrap: break-word;
+        padding: 0 0.5rem;
+
+    }
+
+    .heroSubtitle {
+        font-size: 0.85rem;
+        line-height: 1.3;
+        padding: 0 0.5rem;
+    }
+
+    .heroText {
+        max-width: 95%;
+        margin: 0 auto 1.5rem;
+    }
+
+    .heroButtons {
+        gap: 0.8rem;
+    }
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        max-width: 240px;
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+
+    .heroButtonPrimary,
+    .heroButtonSecondary {
+        padding: 1rem 2rem;
+        min-height: 44px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -926,13 +670,52 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
 
-    .heroImage {
-        transition: none;
+/* Анимации */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
 
-    .serviceCard,
-    .testimonialCard {
-        transition: none;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (min-aspect-ratio: 16/9) {
+    .heroImage {
+        object-position: center 30%;
+    }
+}
+
+@media (max-aspect-ratio: 3/4) {
+    .heroImage {
+        object-position: center 70%;
+    }
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+    .heroImage {
+        object-position: center 25%;
+    }
+}
+
+/* Для ультра-широких мониторов */
+@media (min-width: 2000px) {
+    .hero {
+        max-height: 1000px;
     }
 }
