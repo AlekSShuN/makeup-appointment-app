@@ -1,31 +1,61 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+const API_BASE_URL = 'http://localhost:5002/api';
 
 // Хук для проверки доступных слотов времени
 export const useAvailableSlots = (date, serviceId) => {
     return useQuery({
         queryKey: ['availableSlots', date, serviceId],
         queryFn: async () => {
-            console.log('Checking available slots for:', date, serviceId);
+            if (!date || !serviceId) {
+                return [];
+            }
 
-            // Мок данные - всегда возвращаем одни и те же слоты
-            const availableSlots = [
-                '09:00', '10:00', '11:00', '12:00',
-                '14:00', '15:00', '16:00', '17:00'
-            ];
+            console.log('🔍 Fetching available slots for:', { date, serviceId });
 
-            return availableSlots;
+            const response = await fetch(
+                `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch available slots');
+            }
+
+            const slots = await response.json();
+            console.log('✅ Received available slots:', slots);
+
+            return slots;
         },
+        enabled: !!date && !!serviceId,
+        staleTime: 2 * 60 * 1000,
     });
 };
 
 // Хук для создания бронирования
 export const useCreateBooking = () => {
-    return {
-        mutate: async (bookingData) => {
-            console.log('Creating booking:', bookingData);
-            // Мок успешное создание
-            return { success: true, id: Date.now() };
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (bookingData) => {
+            console.log('📝 Creating booking:', bookingData);
+
+            const response = await fetch(`${API_BASE_URL}/bookings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to create booking');
+            }
+
+            return await response.json();
         },
-        isLoading: false,
-    };
+        onSuccess: () => {
+            queryClient.invalidateQueries(['availableSlots']);
+        },
+    });
 };

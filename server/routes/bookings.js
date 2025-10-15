@@ -50,9 +50,9 @@ router.get('/booking-slots', async (req, res) => {
 
         try {
             const bookedSlots = db.prepare(`
-                SELECT time FROM bookings 
-                WHERE date = ? AND service_id = ?
-            `).all(date, cleanServiceId).map(row => row.time);
+        SELECT time FROM bookings 
+        WHERE date = ?
+    `).all(date).map(row => row.time);
 
             console.log('📊 Booked slots:', bookedSlots);
 
@@ -105,8 +105,8 @@ router.post('/', async (req, res) => {
 
         const existingBooking = db.prepare(`
             SELECT id FROM bookings 
-            WHERE date = ? AND time = ? AND service_id = ?
-        `).get(date, time, serviceId);
+            WHERE date = ? AND time = ?
+        `).get(date, time);
 
         if (existingBooking) {
             return res.status(409).json({

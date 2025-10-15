@@ -230,7 +230,9 @@ const BookingForm = ({ services = [] }) => {
 
             if (response.ok) {
                 setSubmitMessage('✅ Ваша заявка принята! Мы свяжемся с вами для подтверждения.');
-                // Сброс формы
+
+                const currentDate = selectedDate;
+                const currentService = selectedService;
                 setSelectedService('');
                 setSelectedDate('');
                 setSelectedTime('');
@@ -238,6 +240,12 @@ const BookingForm = ({ services = [] }) => {
                 setTouched({});
                 clearAllErrors();
                 setAvailableSlots([]);
+
+                if (currentDate && currentService) {
+                    setTimeout(() => {
+                        fetchSlots(currentDate, currentService);
+                    }, 100);
+                }
             } else {
                 setSubmitMessage(`❌ Ошибка: ${result.message || 'Не удалось отправить заявку'}`);
             }

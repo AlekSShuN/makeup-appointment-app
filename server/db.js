@@ -36,7 +36,7 @@ db.exec(`
 
 function createDefaultAdmin() {
   try {
-    const hashedPassword = bcrypt.hashSync('admin123', 12);
+    const hashedPassword = bcrypt.hashSync('DUBova1994', 12);
 
     const insertAdmin = db.prepare(`
       INSERT OR IGNORE INTO admins (username, password_hash) 
