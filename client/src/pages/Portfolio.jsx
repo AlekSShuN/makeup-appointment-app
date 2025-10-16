@@ -15,7 +15,7 @@ const Portfolio = () => {
         },
         {
             id: 2,
-            image: '/images/portfolio/portfolio2.jpg'
+            image: '/images/portfolio/portfolio2.JPG'
         },
         {
             id: 3,
@@ -27,11 +27,11 @@ const Portfolio = () => {
         },
         {
             id: 5,
-            image: '/images/portfolio/portfolio5.jpg'
+            image: '/images/portfolio/portfolio5.JPG'
         },
         {
             id: 6,
-            image: '/images/portfolio/portfolio6.jpg'
+            image: '/images/portfolio/portfolio6.JPG'
         },
         {
             id: 7,
@@ -39,7 +39,7 @@ const Portfolio = () => {
         },
         {
             id: 8,
-            image: '/images/portfolio/portfolio8.jpg'
+            image: '/images/portfolio/portfolio8.JPG'
         },
         {
             id: 9,
@@ -51,11 +51,11 @@ const Portfolio = () => {
         },
         {
             id: 11,
-            image: '/images/portfolio/portfolio11.jpg'
+            image: '/images/portfolio/portfolio11.JPG'
         },
         {
             id: 12,
-            image: '/images/portfolio/portfolio12.jpg'
+            image: '/images/portfolio/portfolio12.JPG'
         },
         {
             id: 13,
@@ -63,7 +63,7 @@ const Portfolio = () => {
         },
         {
             id: 14,
-            image: '/images/portfolio/portfolio14.jpg'
+            image: '/images/portfolio/portfolio14.JPG'
         },
         {
             id: 15,
@@ -71,11 +71,11 @@ const Portfolio = () => {
         },
         {
             id: 16,
-            image: '/images/portfolio/portfolio16.jpg'
+            image: '/images/portfolio/portfolio16.JPG'
         },
         {
             id: 17,
-            image: '/images/portfolio/portfolio17.jpg'
+            image: '/images/portfolio/portfolio17.JPG'
         },
         {
             id: 18,
@@ -83,7 +83,7 @@ const Portfolio = () => {
         },
         {
             id: 19,
-            image: '/images/portfolio/portfolio19.jpg'
+            image: '/images/portfolio/portfolio19.JPG'
         },
         {
             id: 20,
@@ -147,11 +147,11 @@ const Portfolio = () => {
         },
         {
             id: 35,
-            image: '/images/portfolio/portfolio35.jpg'
+            image: '/images/portfolio/portfolio35.JPG'
         },
         {
             id: 36,
-            image: '/images/portfolio/portfolio36.jpg'
+            image: '/images/portfolio/portfolio36.JPG'
         },
     ];
 
