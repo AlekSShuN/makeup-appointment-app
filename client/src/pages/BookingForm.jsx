@@ -3,7 +3,7 @@ import styles from './BookingForm.module.css';
 import { useValidation } from "../hooks/useValidation.js";
 import Calendar from './Calendar.jsx';
 
-const API_BASE_URL = 'http://localhost:5002/api';
+const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
 
 const BookingForm = ({ services = [] }) => {
     const [selectedService, setSelectedService] = useState('');
