@@ -21,7 +21,7 @@ const BookingManagement = ({ bookings, onDeleteBooking, onRefresh, error }) => {
 
                 console.log('🗑️ Deleting booking:', bookingId);
 
-                const response = await authFetch(`http://localhost:5002/api/bookings/${bookingId}`, {
+                const response = await authFetch(`https://makeup-appointment-app-backend.onrender.com/api/bookings/${bookingId}`, {
                     method: 'DELETE',
                 });
 

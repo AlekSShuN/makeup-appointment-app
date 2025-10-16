@@ -14,7 +14,7 @@ const Booking = () => {
             setError(null);
 
             console.log('Fetching services from /api/services');
-            const response = await fetch('/api/services');
+            const response = await fetch('https://makeup-appointment-app-backend.onrender.com/api/services');
 
             console.log('Response status:', response.status);
 

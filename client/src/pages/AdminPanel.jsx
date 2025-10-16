@@ -27,7 +27,7 @@ const AdminPanel = () => {
         try {
             console.log('🔐 Fetching bookings...');
             setIsLoading(true);
-            const response = await authFetch('http://localhost:5002/api/bookings');
+            const response = await authFetch('https://makeup-appointment-app-backend.onrender.com/api/bookings');
 
             console.log('📡 Response status:', response.status);
 
@@ -59,7 +59,7 @@ const AdminPanel = () => {
     const handleDeleteBooking = async (bookingId) => {
         try {
             console.log('🗑️ Deleting booking:', bookingId);
-            const response = await authFetch(`http://localhost:5002/api/bookings/${bookingId}`, {
+            const response = await authFetch(`https://makeup-appointment-app-backend.onrender.com/api/bookings/${bookingId}`, {
                 method: 'DELETE'
             });
 
