@@ -3,7 +3,7 @@ import { lazy, Suspense } from "react";
 import Layout from "./component/Layout/Layout.jsx";
 import AdminLogin from './pages/AdminLogin.jsx';
 import ProtectedRoute from './component/ProtectedRoute/ProtectedRoute.jsx';
-import AdminPanel from './pages/AdminPanel.jsx';
+
 
 
 // Ленивые импорты
@@ -13,6 +13,7 @@ const Portfolio = lazy(() => import('./pages/Portfolio.jsx'));
 const Contacts = lazy(() => import('./pages/Contacts.jsx'));
 const Booking = lazy(() => import('./pages/Booking.jsx'));
 const BookingManagement = lazy(() => import('./pages/BookingManagement.jsx'));
+const AdminPanel = lazy(() => import('./pages/AdminPanel.jsx'));
 
 const LoadingSpinner = () => (
     <div style={{
