@@ -3,31 +3,67 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- SEO -->
   <meta name="description" content="Онлайн запись к профессиональному визажисту. Макияж, прически, свадебные образы." />
-  <meta name="keywords" content="визажист, макияж, запись, прическа, свадебный макияж" />
+  <meta name="keywords" content="визажист, макияж, запись, прическа, свадебный макияж, Саранск" />
   <meta name="author" content="Miss_Nadya Makeup" />
 
-  <meta property="og:title" content="Запись к визажисту | Профессиональный макияж" />
-  <meta property="og:description"
-    content="Онлайн запись к визажисту. Создаем идеальные образы для любых мероприятий." />
-  <meta property="og:type" content="website" />
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
 
+  <!-- Theme Colors -->
   <meta name="theme-color" content="#ff69b4" />
 
-  <title>Miss_Nadya Makeup | Онлайн запись</title>
+  <!-- Mobile App Capable -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Miss_Nadya Makeup">
+
+  <link rel="stylesheet" href="/assets/index-a7ob9HSc.css">
+
+  <noscript>
+    <link rel="stylesheet" href="/assets/index-a7ob9HSc.css">
+  </noscript>
+
+  <title>Miss_Nadya Makeup | Онлайн запись к визажисту</title>
+
+  <link rel="icon" type="ico" href="/icon.ico" />
+  <link rel="icon" type="image/png" href="/icon.png" />
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="loading-screen">
+      <div>Miss_Nadya Makeup</div>
+    </div>
+  </div>
+
   <noscript>
     <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
       <h2>Для работы приложения необходим JavaScript</h2>
       <p>Пожалуйста, включите JavaScript в настройках браузера и перезагрузите страницу.</p>
+      <p>Или свяжитесь с нами: <strong>+7 (917) 637-64-81</strong></p>
     </div>
   </noscript>
+
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function (registration) {
+              console.log('SW registered');
+            })
+            .catch(function (error) {
+              console.log('SW registration failed');
+            });
+        }
+      }, 2000);
+    });
+  </script>
 
   <script type="module" src="/src/main.jsx"></script>
 </body>

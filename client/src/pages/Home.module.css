@@ -84,6 +84,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     line-height: 1.1;
+    font-family: initial;
 }
 
 .heroSubtitle {
@@ -92,6 +93,7 @@
     margin-bottom: 1.5rem;
     opacity: 0.95;
     font-weight: 300;
+    font-family: initial;
 }
 
 .heroButtons {
