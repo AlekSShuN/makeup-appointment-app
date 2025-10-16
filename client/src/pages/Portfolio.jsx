@@ -147,11 +147,11 @@ const Portfolio = () => {
         },
         {
             id: 35,
-            image: '/images/portfolio/portfolio35.JPG'
+            image: '/images/portfolio/portfolio35.jpg'
         },
         {
             id: 36,
-            image: '/images/portfolio/portfolio36.JPG'
+            image: '/images/portfolio/portfolio36.jpg'
         },
     ];
 
