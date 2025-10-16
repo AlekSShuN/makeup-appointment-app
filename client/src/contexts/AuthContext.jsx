@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:5002/api/auth/verify', {
+            const response = await fetch('https://makeup-appointment-app-backend.onrender.com/api/auth/verify', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             console.log('🔐 Attempting login...');
-            const response = await fetch('http://localhost:5002/api/auth/login', {
+            const response = await fetch('https://makeup-appointment-app-backend.onrender.com/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

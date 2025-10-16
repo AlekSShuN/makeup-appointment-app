@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 
+const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
+
 const VALIDATION_RULES = {
     name: {
         minLength: 2,

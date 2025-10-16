@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-const API_BASE_URL = 'http://localhost:5002/api';
+const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
 
 // Хук для проверки доступных слотов времени
 export const useAvailableSlots = (date, serviceId) => {

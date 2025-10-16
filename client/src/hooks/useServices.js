@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const API_BASE_URL = 'http://localhost:5002/api';
+const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
 
 export const useServices = () => {
     return useQuery({
