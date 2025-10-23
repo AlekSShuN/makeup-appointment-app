@@ -178,7 +178,6 @@ const Home = () => {
                             <p className={styles.aboutParagraph}>В сфере красоты с 2020 года. Я убеждена, что макияж — это инструмент, который подчеркивает вашу уникальность, а не скрывает ее.</p>
                             <p className={styles.aboutParagraph}>Каждый год я прохожу повышение квалификации и изучаю новые техники, чтобы предлагать вам самые актуальные и современные решения.</p>
                             <ul className={styles.achievementsList}>
-                                <li className={styles.achievementItem}>Сертифицированный специалист по технике air-makeup</li>
                                 <li className={styles.achievementItem}>Опыт работы на съемках для журналов</li>
                                 <li className={styles.achievementItem}>Более 300 довольных клиентов</li>
                             </ul>

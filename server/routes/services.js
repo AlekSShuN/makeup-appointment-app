@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
         if (error.code === 'ENOENT') {
             return res.json([
                 { "id": 1, "name": "Дневной макияж", "price": 2000, "duration": 60 },
-                { "id": 2, "name": "Вечерний макияж", "price": 2500, "duration": 60 },
+                { "id": 2, "name": "Вечерний макияж", "price": 2300, "duration": 60 },
                 { "id": 3, "name": "Свадебный образ", "price": 6000, "duration": 150 },
                 { "id": 4, "name": "Локоны/Укладка", "price": 2000, "duration": 60 },
                 { "id": 5, "name": "Сопровождение невесты", "price": 2000, "duration": 60 },
