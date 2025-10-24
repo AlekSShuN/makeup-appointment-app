@@ -203,6 +203,58 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+
+            <section ref={(el) => addSectionRef(el, 4)} className={styles.pwaSection}>
+                <div className={styles.container}>
+                    <div className={styles.pwaCard}>
+                        <div className={styles.pwaHeader}>
+                            <h2 className={styles.pwaTitle}>📱 Установите наше приложение!</h2>
+                            <p className={styles.pwaSubtitle}>Быстрый доступ к записи без браузера</p>
+                        </div>
+
+                        <div className={styles.installSteps}>
+                            <div className={styles.step}>
+                                <div className={styles.stepNumber}>1</div>
+                                <div className={styles.stepContent}>
+                                    <h3>Нажмите "Поделиться"</h3>
+                                    <p>В Safari найдите кнопку 📤 в нижней панели</p>
+                                </div>
+                            </div>
+
+                            <div className={styles.step}>
+                                <div className={styles.stepNumber}>2</div>
+                                <div className={styles.stepContent}>
+                                    <h3>Выберите "На экран «Домой»"</h3>
+                                    <p>Прокрутите меню вниз до этой опции</p>
+                                </div>
+                            </div>
+
+                            <div className={styles.step}>
+                                <div className={styles.stepNumber}>3</div>
+                                <div className={styles.stepContent}>
+                                    <h3>Нажмите "Добавить"</h3>
+                                    <p>Приложение появится на главном экране</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.pwaBenefits}>
+                            <div className={styles.benefit}>
+                                <span className={styles.benefitIcon}>⚡</span>
+                                <span>Быстрая загрузка</span>
+                            </div>
+                            <div className={styles.benefit}>
+                                <span className={styles.benefitIcon}>📴</span>
+                                <span>Работает оффлайн</span>
+                            </div>
+                            <div className={styles.benefit}>
+                                <span className={styles.benefitIcon}>🔔</span>
+                                <span>Уведомления</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };
