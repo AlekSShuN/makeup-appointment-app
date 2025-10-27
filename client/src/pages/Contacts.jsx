@@ -26,7 +26,7 @@ const Contacts = () => {
         address: "г. Саранск, ул. Большевистская, 30",
         phone: "+7 (917) 637-64-81",
         workingHours: {
-            weekdays: "09:00 - 21:00",
+            weekdays: "09:00 - 19:00",
             weekend: "10:00 - 19:00"
         },
         social: {
