@@ -11,12 +11,12 @@ const Home = () => {
     const observerRef = useRef(null);
 
     const slides = [
-        { image: "/slider/slider1.JPG", alt: "Вечерний макияж" },
-        { image: "/slider/slider2.JPG", alt: "Свадебный макияж" },
-        { image: "/slider/slider3.JPG", alt: "Дневной макияж" },
-        { image: "/slider/slider6.JPG", alt: "Макияж" },
-        { image: "/slider/slider4.jpg", alt: "Макияж" },
-        { image: "/slider/slider5.jpg", alt: "Макияж" },
+        { image: "/slider/slider1.webp", alt: "Вечерний макияж" },
+        { image: "/slider/slider2.webp", alt: "Свадебный макияж" },
+        { image: "/slider/slider3.webp", alt: "Дневной макияж" },
+        { image: "/slider/slider6.webp", alt: "Макияж" },
+        { image: "/slider/slider4.webp", alt: "Макияж" },
+        { image: "/slider/slider5.webp", alt: "Макияж" },
     ];
 
     const preloadImages = useCallback(async () => {
@@ -121,7 +121,7 @@ const Home = () => {
                         <a href="/services#wedding" className={styles.serviceCard}>
                             <div className={styles.imageContainer}>
                                 <img
-                                    src="/images/services/wedding-makeup.JPG"
+                                    src="/images/services/wedding-makeup.webp"
                                     alt="Свадебный макияж"
                                     className={styles.serviceImage}
                                 />
@@ -136,7 +136,7 @@ const Home = () => {
                         <a href="/services#evening" className={styles.serviceCard}>
                             <div className={styles.imageContainer}>
                                 <img
-                                    src="/images/services/evening-makeup.JPG"
+                                    src="/images/services/evening-makeup.webp"
                                     alt="Вечерний макияж"
                                     className={styles.serviceImage}
                                 />
@@ -151,7 +151,7 @@ const Home = () => {
                         <a href="/services#lesson" className={styles.serviceCard}>
                             <div className={styles.imageContainer}>
                                 <img
-                                    src="/images/services/makeup-lesson.JPG"
+                                    src="/images/services/makeup-lesson.webp"
                                     alt="Уроки макияжа"
                                     className={styles.serviceImage}
                                 />
@@ -170,7 +170,7 @@ const Home = () => {
                 <div className={styles.container}>
                     <div className={styles.aboutContent}>
                         <div className={styles.aboutImage}>
-                            <img src="/images/services/miss_nadya.JPG" alt="Визажист Надежда" />
+                            <img src="/images/services/miss_nadya.webp" alt="Визажист Надежда" />
                         </div>
                         <div className={styles.aboutText}>
                             <h2 className={styles.sectionTitle}>Обо мне</h2>

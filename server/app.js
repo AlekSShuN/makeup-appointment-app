@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 5002;
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://makeup-appointment-app.vercel.app'
+        'https://makeup-appointment-app.vercel.app',
+        'https://miss-nadya-makeup.ru',
+        'https://www.miss-nadya-makeup.ru'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

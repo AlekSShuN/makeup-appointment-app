@@ -11,147 +11,147 @@ const Portfolio = () => {
     const allPortfolioItems = [
         {
             id: 1,
-            image: '/images/portfolio/portfolio1.JPG'
+            image: '/images/portfolio/portfolio1.webp'
         },
         {
             id: 2,
-            image: '/images/portfolio/portfolio2.JPG'
+            image: '/images/portfolio/portfolio2.webp'
         },
         {
             id: 3,
-            image: '/images/portfolio/portfolio3.JPG'
+            image: '/images/portfolio/portfolio3.webp'
         },
         {
             id: 4,
-            image: '/images/portfolio/portfolio4.JPG'
+            image: '/images/portfolio/portfolio4.webp'
         },
         {
             id: 5,
-            image: '/images/portfolio/portfolio5.JPG'
+            image: '/images/portfolio/portfolio5.webp'
         },
         {
             id: 6,
-            image: '/images/portfolio/portfolio6.JPG'
+            image: '/images/portfolio/portfolio6.webp'
         },
         {
             id: 7,
-            image: '/images/portfolio/portfolio7.JPG'
+            image: '/images/portfolio/portfolio7.webp'
         },
         {
             id: 8,
-            image: '/images/portfolio/portfolio8.JPG'
+            image: '/images/portfolio/portfolio8.webp'
         },
         {
             id: 9,
-            image: '/images/portfolio/portfolio9.JPG'
+            image: '/images/portfolio/portfolio9.webp'
         },
         {
             id: 10,
-            image: '/images/portfolio/portfolio10.JPG'
+            image: '/images/portfolio/portfolio10.webp'
         },
         {
             id: 11,
-            image: '/images/portfolio/portfolio11.JPG'
+            image: '/images/portfolio/portfolio11.webp'
         },
         {
             id: 12,
-            image: '/images/portfolio/portfolio12.JPG'
+            image: '/images/portfolio/portfolio12.webp'
         },
         {
             id: 13,
-            image: '/images/portfolio/portfolio13.JPG'
+            image: '/images/portfolio/portfolio13.webp'
         },
         {
             id: 14,
-            image: '/images/portfolio/portfolio14.JPG'
+            image: '/images/portfolio/portfolio14.webp'
         },
         {
             id: 15,
-            image: '/images/portfolio/portfolio15.JPG'
+            image: '/images/portfolio/portfolio15.webp'
         },
         {
             id: 16,
-            image: '/images/portfolio/portfolio16.JPG'
+            image: '/images/portfolio/portfolio16.webp'
         },
         {
             id: 17,
-            image: '/images/portfolio/portfolio17.JPG'
+            image: '/images/portfolio/portfolio17.webp'
         },
         {
             id: 18,
-            image: '/images/portfolio/portfolio18.JPG'
+            image: '/images/portfolio/portfolio18.webp'
         },
         {
             id: 19,
-            image: '/images/portfolio/portfolio19.JPG'
+            image: '/images/portfolio/portfolio19.webp'
         },
         {
             id: 20,
-            image: '/images/portfolio/portfolio20.JPG'
+            image: '/images/portfolio/portfolio20.webp'
         },
         {
             id: 21,
-            image: '/images/portfolio/portfolio21.JPG'
+            image: '/images/portfolio/portfolio21.webp'
         },
         {
             id: 22,
-            image: '/images/portfolio/portfolio22.JPG'
+            image: '/images/portfolio/portfolio22.webp'
         },
         {
             id: 23,
-            image: '/images/portfolio/portfolio23.JPG'
+            image: '/images/portfolio/portfolio23.webp'
         },
         {
             id: 24,
-            image: '/images/portfolio/portfolio24.JPG'
+            image: '/images/portfolio/portfolio24.webp'
         },
         {
             id: 25,
-            image: '/images/portfolio/portfolio25.JPG'
+            image: '/images/portfolio/portfolio25.webp'
         },
         {
             id: 26,
-            image: '/images/portfolio/portfolio26.JPG'
+            image: '/images/portfolio/portfolio26.webp'
         },
         {
             id: 27,
-            image: '/images/portfolio/portfolio27.JPG'
+            image: '/images/portfolio/portfolio27.webp'
         },
         {
             id: 28,
-            image: '/images/portfolio/portfolio28.JPG'
+            image: '/images/portfolio/portfolio28.webp'
         },
         {
             id: 29,
-            image: '/images/portfolio/portfolio29.JPG'
+            image: '/images/portfolio/portfolio29.webp'
         },
         {
             id: 30,
-            image: '/images/portfolio/portfolio30.JPG'
+            image: '/images/portfolio/portfolio30.webp'
         },
         {
             id: 31,
-            image: '/images/portfolio/portfolio31.JPG'
+            image: '/images/portfolio/portfolio31.webp'
         },
         {
             id: 32,
-            image: '/images/portfolio/portfolio32.JPG'
+            image: '/images/portfolio/portfolio32.webp'
         },
         {
             id: 33,
-            image: '/images/portfolio/portfolio33.JPG'
+            image: '/images/portfolio/portfolio33.webp'
         },
         {
             id: 34,
-            image: '/images/portfolio/portfolio34.JPG'
+            image: '/images/portfolio/portfolio34.webp'
         },
         {
             id: 35,
-            image: '/images/portfolio/portfolio35.jpg'
+            image: '/images/portfolio/portfolio35.webp'
         },
         {
             id: 36,
-            image: '/images/portfolio/portfolio36.jpg'
+            image: '/images/portfolio/portfolio36.webp'
         },
     ];
 
