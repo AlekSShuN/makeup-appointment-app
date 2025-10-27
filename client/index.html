@@ -11,7 +11,7 @@
   <meta name="author" content="Miss_Nadya Makeup" />
 
   <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+  <link rel="manifest" href="/manifest.webmanifest" />
 
   <!-- Theme Colors -->
   <meta name="theme-color" content="#ff69b4" />
@@ -30,8 +30,8 @@
 
   <title>Miss_Nadya Makeup | Онлайн запись к визажисту</title>
 
-  <link rel="icon" type="ico" href="/icon.ico" />
-  <link rel="icon" type="image/png" href="/icon.png" />
+  <link rel="icon" type="image/png" href="./icons/icon-192x192.png" />
+  <link rel="shortcut icon" href="./icon.png" />
 </head>
 
 <body>
@@ -48,22 +48,6 @@
       <p>Или свяжитесь с нами: <strong>+7 (917) 637-64-81</strong></p>
     </div>
   </noscript>
-
-  <script>
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/sw.js')
-            .then(function (registration) {
-              console.log('SW registered');
-            })
-            .catch(function (error) {
-              console.log('SW registration failed');
-            });
-        }
-      }, 2000);
-    });
-  </script>
 
   <script type="module" src="/src/main.jsx"></script>
 </body>
