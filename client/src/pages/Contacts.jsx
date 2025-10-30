@@ -6,7 +6,7 @@ import telegramIcon from '../assets/image/icons/telegram.png';
 import vkIcon from '../assets/image/icons/vk.png';
 
 const WORKING_HOURS = {
-    weekdays: { start: 9, end: 21 },
+    weekdays: { start: 9, end: 19 },
     weekend: { start: 10, end: 19 }
 };
 

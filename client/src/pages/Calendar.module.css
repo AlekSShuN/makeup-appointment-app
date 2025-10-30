@@ -75,11 +75,13 @@
     position: absolute;
     top: 100%;
     left: 0;
-    width: 300px;
+    width: 100%;
+    max-width: 320px;
+    min-width: 280px;
     background: white;
     border: 2px solid #e1e5e9;
     border-radius: 8px;
-    padding: 16px;
+    padding: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     margin-top: 4px;
@@ -120,26 +122,27 @@
 .calendarGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 2px;
     margin-bottom: 12px;
 }
 
 .dayHeader {
     text-align: center;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 11px;
     color: #6c757d;
-    padding: 8px 4px;
+    padding: 6px 2px;
 }
 
 .day {
     border: none;
     background: none;
-    padding: 8px;
+    padding: 6px 2px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
+    font-size: 12px;
+    min-height: 32px;
 }
 
 .day.available:hover {
@@ -188,6 +191,32 @@
 .todayButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+@media (max-width: 360px) {
+    .calendarDropdown {
+        padding: 8px;
+        max-width: 280px;
+    }
+
+    .dayHeader {
+        font-size: 10px;
+        padding: 4px 1px;
+    }
+
+    .day {
+        padding: 4px 1px;
+        font-size: 11px;
+        min-height: 28px;
+    }
+
+    .monthYear {
+        font-size: 14px;
+    }
+
+    .navButton {
+        padding: 2px 6px;
+    }
 }
 
 @keyframes fadeInScale {
