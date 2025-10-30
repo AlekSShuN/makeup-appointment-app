@@ -74,7 +74,7 @@
 .calendarDropdown {
     position: absolute;
     top: 100%;
-    left: -10%;
+    left: 0;
     width: 100%;
     max-width: 380px;
     min-width: 320px;

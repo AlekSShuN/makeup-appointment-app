@@ -9,7 +9,7 @@ const VALIDATION_RULES = {
         pattern: /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/
     },
     phone: {
-        minLength: 11,
+        minLength: 10,
         pattern: /^\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}$/
     },
 };
@@ -66,12 +66,10 @@ export const useValidation = () => {
                 break;
 
             case 'phone':
-                const phoneNumbers = value.replace(/\D/g, '');
+                const phoneNumbers = value.replace(/\D/g, '').slice(1);
                 if (!phoneNumbers) {
                     error = ERROR_MESSAGES.REQUIRED;
-                } else if (phoneNumbers.length < VALIDATION_RULES.phone.minLength) {
-                    error = ERROR_MESSAGES.PHONE_INVALID;
-                } else if (!/^7\d{10}$/.test(phoneNumbers)) {
+                } else if (phoneNumbers.length < 10) {
                     error = ERROR_MESSAGES.PHONE_INVALID;
                 }
                 break;

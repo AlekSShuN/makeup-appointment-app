@@ -22,7 +22,6 @@ const BookingForm = ({ services = [] }) => {
 
     const { errors, validateForm, clearError, clearAllErrors } = useValidation();
 
-    // Функция проверки, является ли временной слот прошедшим
     const isPastTimeSlot = useCallback((date, time) => {
         if (!date || !time) return false;
 
@@ -38,11 +37,7 @@ const BookingForm = ({ services = [] }) => {
             setAvailableSlots([]);
             return;
         }
-
-        // Очищаем предыдущий выбор времени
         setSelectedTime('');
-
-        // ДОБАВЬТЕ ДЕБАУНСИНГ ПЕРЕД РЕАЛЬНЫМ ЗАПРОСОМ
         setTimeout(async () => {
             try {
                 const response = await fetch(
@@ -62,11 +57,10 @@ const BookingForm = ({ services = [] }) => {
                 const filteredSlots = mockSlots.filter(slot => !isPastTimeSlot(date, slot));
                 setAvailableSlots(filteredSlots);
             }
-        }, 500); // Дебаунсинг 500ms
+        }, 500);
 
     }, [isPastTimeSlot]);
 
-    // Очистка при размонтировании
     useEffect(() => {
         return () => {
             if (abortControllerRef.current) {
@@ -92,7 +86,6 @@ const BookingForm = ({ services = [] }) => {
         return () => clearTimeout(timeoutId);
     }, [validateFormDebounced]);
 
-    // Проверка выбранного времени при изменении даты или времени
     useEffect(() => {
         if (selectedDate && selectedTime && isPastTimeSlot(selectedDate, selectedTime)) {
             setSelectedTime('');
@@ -134,34 +127,51 @@ const BookingForm = ({ services = [] }) => {
     }, []);
 
     const formatPhone = useCallback((value) => {
-        const numbers = value.replace(/\D/g, '');
-
-        // Если пользователь стер номер полностью
-        if (!numbers || numbers === '7') return '';
-
-        let formattedValue = value;
-
-        if (numbers.length <= 1) {
-            formattedValue = numbers ? '+7' : '';
-        } else if (numbers.length <= 4) {
-            formattedValue = `+7 (${numbers.slice(1, 4)}`;
-        } else if (numbers.length <= 7) {
-            formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}`;
-        } else if (numbers.length <= 9) {
-            formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}-${numbers.slice(7, 9)}`;
-        } else {
-            formattedValue = `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}-${numbers.slice(7, 9)}-${numbers.slice(9, 11)}`;
+        if (!value || !value.startsWith('+7')) {
+            return '+7';
         }
+
+        const numbers = value.replace(/\D/g, '').slice(1);
+
+        let formattedValue = '+7';
+
+        if (numbers.length > 0) {
+            formattedValue += ' (' + numbers.slice(0, 3);
+        }
+        if (numbers.length > 3) {
+            formattedValue += ') ' + numbers.slice(3, 6);
+        }
+        if (numbers.length > 6) {
+            formattedValue += '-' + numbers.slice(6, 8);
+        }
+        if (numbers.length > 8) {
+            formattedValue += '-' + numbers.slice(8, 10);
+        }
+
         return formattedValue;
-    }, []);
+    }, [])
 
     const handlePhoneChange = useCallback((value) => {
+        if (!value.startsWith('+7')) {
+            handleInputChange('phone', '+7');
+            return;
+        }
         const formattedPhone = formatPhone(value);
         handleInputChange('phone', formattedPhone);
     }, [formatPhone, handleInputChange]);
 
+    const handlePhoneKeyDown = useCallback((e) => {
+        const cursorPosition = e.target.selectionStart;
+        if ((e.key === 'Backspace' || e.key === 'Delete') && cursorPosition <= 2) {
+            e.preventDefault();
+            return;
+        }
+        if (!/[\d]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(e.key)) {
+            e.preventDefault();
+        }
+    }, []);
+
     const handleTimeSelect = useCallback((time) => {
-        // Проверяем, не является ли выбранное время прошедшим
         if (selectedDate && isPastTimeSlot(selectedDate, time)) {
             clearError('time');
             return;
@@ -259,7 +269,7 @@ const BookingForm = ({ services = [] }) => {
     const isFormValid = selectedService && selectedDate && selectedTime &&
         clientData.name?.trim() &&
         clientData.phone?.replace(/\D/g, '').length >= 11 &&
-        !isPastTimeSlot(selectedDate, selectedTime); // Добавляем проверку на прошедшее время
+        !isPastTimeSlot(selectedDate, selectedTime);
 
     return (
         <form onSubmit={formSubmissionHandler} className={styles.form} noValidate>
@@ -354,10 +364,19 @@ const BookingForm = ({ services = [] }) => {
                     type="tel"
                     value={clientData.phone}
                     onChange={(e) => handlePhoneChange(e.target.value)}
+                    onKeyDown={handlePhoneKeyDown}
                     onBlur={() => handleBlur('phone')}
                     className={`${styles.input} ${errors.phone ? styles.error : ''}`}
                     placeholder="+7 (999) 999-99-99"
                     required
+                    onPaste={(e) => {
+                        e.preventDefault();
+                        const pastedText = e.clipboardData.getData('text');
+                        const numbers = pastedText.replace(/\D/g, '');
+                        if (numbers) {
+                            handlePhoneChange('+7' + numbers);
+                        }
+                    }}
                 />
                 {errors.phone && (
                     <span className={styles.errorText}>{errors.phone}</span>
