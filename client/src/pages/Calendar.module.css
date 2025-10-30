@@ -76,8 +76,8 @@
     top: 100%;
     left: 0;
     width: 100%;
-    max-width: 320px;
-    min-width: 280px;
+    max-width: 350px;
+    min-width: 300px;
     background: white;
     border: 2px solid #e1e5e9;
     border-radius: 8px;
@@ -137,12 +137,12 @@
 .day {
     border: none;
     background: none;
-    padding: 6px 2px;
+    padding: 8px 4px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 12px;
-    min-height: 32px;
+    min-height: 36px;
 }
 
 .day.available:hover {
