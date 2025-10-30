@@ -184,3 +184,5 @@ Thumbs.dbclient/bundle-stats.html
 server/.env*.txt
 server/data/database.db
 *.db
+beauty.db
+

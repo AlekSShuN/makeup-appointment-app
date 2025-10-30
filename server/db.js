@@ -36,35 +36,27 @@ db.exec(`
 
 function createDefaultAdmin() {
   try {
-    const hashedPassword = bcrypt.hashSync('DUBova1994', 12);
+    const username = process.env.ADMIN_USERNAME || 'admin';
+    const password = process.env.ADMIN_PASSWORD;
+
+    if (!password) {
+      console.log('⚠️  ADMIN_PASSWORD not set in environment variables');
+      return;
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 12);
 
     const insertAdmin = db.prepare(`
       INSERT OR IGNORE INTO admins (username, password_hash) 
       VALUES (?, ?)
     `);
 
-    const result = insertAdmin.run('admin', hashedPassword);
+    const result = insertAdmin.run(username, hashedPassword);
 
     if (result.changes > 0) {
-      console.log('✅ Создан администратор по умолчанию: admin / admin123');
+      console.log(`✅ Создан администратор по умолчанию: ${username}`);
     } else {
-      console.log('ℹ️  Администратор уже существует');
-
-      const updateAdmin = db.prepare(`
-        UPDATE admins SET password_hash = ? WHERE username = ?
-      `);
-      const updateResult = updateAdmin.run(hashedPassword, 'admin');
-
-      if (updateResult.changes > 0) {
-        console.log('🔒 Пароль администратора обновлен с хешированием');
-      }
-
-      const admin = db.prepare('SELECT * FROM admins WHERE username = ?').get('admin');
-      console.log('📋 Existing admin:', {
-        username: admin.username,
-        password_hash: admin.password_hash.substring(0, 20) + '...',
-        role: admin.role
-      });
+      console.log(`ℹ️  Администратор ${username} уже существует`);
     }
   } catch (error) {
     console.error('❌ Ошибка при создании администратора:', error);

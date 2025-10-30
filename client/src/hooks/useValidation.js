@@ -66,10 +66,11 @@ export const useValidation = () => {
                 break;
 
             case 'phone':
-                const phoneNumbers = value.replace(/\D/g, '').slice(1);
+                const phoneNumbers = value.replace(/\D/g, '');
+
                 if (!phoneNumbers) {
                     error = ERROR_MESSAGES.REQUIRED;
-                } else if (phoneNumbers.length < 10) {
+                } else if (phoneNumbers.length !== 11 || !phoneNumbers.startsWith('7')) {
                     error = ERROR_MESSAGES.PHONE_INVALID;
                 }
                 break;

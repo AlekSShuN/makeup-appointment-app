@@ -268,7 +268,7 @@ const BookingForm = ({ services = [] }) => {
 
     const isFormValid = selectedService && selectedDate && selectedTime &&
         clientData.name?.trim() &&
-        clientData.phone?.replace(/\D/g, '').length >= 11 &&
+        clientData.phone?.replace(/\D/g, '').length === 11 &&
         !isPastTimeSlot(selectedDate, selectedTime);
 
     return (
