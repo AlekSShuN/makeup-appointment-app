@@ -74,7 +74,7 @@
 .calendarDropdown {
     position: absolute;
     top: 100%;
-    left: 0;
+    left: -10%;
     width: 100%;
     max-width: 380px;
     min-width: 320px;
@@ -122,7 +122,7 @@
 .calendarGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+    gap: 1px;
     margin-bottom: 12px;
 }
 
@@ -131,7 +131,8 @@
     font-weight: 600;
     font-size: 11px;
     color: #6c757d;
-    padding: 6px 2px;
+    padding: 4px 2px;
+    margin-bottom: 2px;
 }
 
 .day {
