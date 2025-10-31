@@ -5,9 +5,8 @@ import servicesRoutes from './routes/services.js';
 import healthRoutes from './routes/health.js';
 import authRoutes from './routes/auth.js';
 
-
 const app = express();
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5007;
 
 app.use(cors({
     origin: [

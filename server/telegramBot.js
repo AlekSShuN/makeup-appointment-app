@@ -17,11 +17,19 @@ console.log('🔧 Telegram bot configuration check:', {
 });
 
 export const sendTelegramNotification = async (bookingData, service) => {
-    if (!token || !adminChatId) {
-        console.log('❌ Telegram bot not configured - missing token or chat ID');
-        console.log('   Token:', token ? 'SET' : 'MISSING');
-        console.log('   Chat ID:', adminChatId ? 'SET' : 'MISSING');
-        return;
+    console.log('🔔 [Telegram] Function called with data:', {
+        bookingId: bookingData.bookingId,
+        clientName: bookingData.client?.name,
+        service: service?.name
+    });
+
+    if (!token || !adminChatId || !bot) {
+        console.log('❌ [Telegram] Bot not configured:', {
+            hasToken: !!token,
+            hasChatId: !!adminChatId,
+            hasBotInstance: !!bot
+        });
+        return false;
     }
 
     try {
@@ -38,32 +46,38 @@ export const sendTelegramNotification = async (bookingData, service) => {
 ${bookingData.client.comment ? `Комментарий: ${bookingData.client.comment}` : ''}
 
 ID записи: ${bookingData.bookingId}
-        `;
+        `.trim();
 
-        console.log('📤 Attempting to send Telegram message...');
+        console.log('📤 [Telegram] Attempting to send message...');
         console.log('   To chat ID:', adminChatId);
         console.log('   Message length:', message.length);
+        console.log('   Message preview:', message.substring(0, 100) + '...');
 
-        await bot.telegram.sendMessage(adminChatId, message);
-        console.log('✅ Telegram notification sent successfully!');
+        const result = await bot.telegram.sendMessage(adminChatId, message);
+        console.log('✅ [Telegram] Notification sent successfully! Message ID:', result.message_id);
+        return true;
 
     } catch (error) {
-        console.error('❌ Failed to send Telegram notification:', error.message);
+        console.error('❌ [Telegram] Failed to send notification:', error.message);
 
         if (error.response) {
-            console.error('📋 Telegram API error:', {
+            console.error('📋 [Telegram] API error details:', {
                 description: error.response.description,
-                error_code: error.response.error_code
+                error_code: error.response.error_code,
+                parameters: error.response.parameters
             });
 
             if (error.response.error_code === 401) {
                 console.error('💡 Solution: Check if Telegram token is correct');
             } else if (error.response.error_code === 400) {
-                console.error('💡 Solution: Check if chat ID is correct');
+                console.error('💡 Solution: Check if chat ID is correct or user blocked the bot');
             } else if (error.response.error_code === 403) {
                 console.error('💡 Solution: User blocked the bot');
             }
+        } else {
+            console.error('📋 [Telegram] Error stack:', error.stack);
         }
+        return false;
     }
 };
 
@@ -78,6 +92,7 @@ export const setupAdminBot = () => {
 
         bot.start((ctx) => {
             const chatId = ctx.chat.id.toString();
+            console.log(`👋 [Telegram] /start command from: ${chatId}`);
 
             if (chatId !== adminChatId) {
                 ctx.reply('❌ Этот бот только для администратора.');
@@ -88,9 +103,17 @@ export const setupAdminBot = () => {
             ctx.reply('👋 Бот уведомлений запущен! Вы будете получать уведомления о новых записях.');
             console.log(`✅ Admin started the bot: ${chatId}`);
         });
+
+        // Добавляем обработчик сообщений для дебага
+        bot.on('message', (ctx) => {
+            const chatId = ctx.chat.id.toString();
+            console.log(`📩 [Telegram] Message from ${chatId}: ${ctx.message.text}`);
+        });
+
         bot.launch().then(() => {
             console.log('🤖 Telegram bot is running with Telegraf');
         });
+
         bot.catch((error) => {
             console.error('❌ Telegram bot error:', error);
         });
@@ -100,5 +123,12 @@ export const setupAdminBot = () => {
     }
 };
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+// Graceful shutdown
+process.once('SIGINT', () => {
+    console.log('🛑 Shutting down bot...');
+    bot.stop('SIGINT');
+});
+process.once('SIGTERM', () => {
+    console.log('🛑 Shutting down bot...');
+    bot.stop('SIGTERM');
+});

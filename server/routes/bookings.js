@@ -129,21 +129,41 @@ router.post('/', async (req, res) => {
         const bookingId = result.lastInsertRowid;
         console.log('✅ Booking created with ID:', bookingId);
 
+        const bookingData = {
+            bookingId: bookingId,
+            date: date,
+            time: time,
+            client: {
+                name: client.name,
+                phone: client.phone,
+                comment: client.comment || ''
+            }
+        };
+
+        console.log('📤 Prepared Telegram data:', bookingData);
+
         try {
-            const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
-            const servicesData = await fs.readFile(servicesPath, 'utf8');
-            const services = JSON.parse(servicesData);
-            const service = services.find(s => s.id == serviceId);
+            let service = null;
+            try {
+                const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
+                const servicesData = await fs.readFile(servicesPath, 'utf8');
+                const services = JSON.parse(servicesData);
+                service = services.find(s => s.id == serviceId);
+                console.log('🔍 Found service:', service);
+            } catch (serviceError) {
+                console.log('⚠️ Could not load service info:', serviceError.message);
+                service = { name: `Услуга ID: ${serviceId}` };
+            }
 
-            await sendTelegramNotification({
-                serviceId,
-                date,
-                time,
-                client,
-                bookingId
-            }, service);
+            console.log('🚀 Calling sendTelegramNotification...');
+            const telegramResult = await sendTelegramNotification(bookingData, service);
 
-            console.log('✅ Telegram notification sent');
+            if (telegramResult) {
+                console.log('✅ Telegram notification sent successfully!');
+            } else {
+                console.log('❌ Telegram notification failed');
+            }
+
         } catch (telegramError) {
             console.error('❌ Failed to send Telegram notification:', telegramError);
         }
