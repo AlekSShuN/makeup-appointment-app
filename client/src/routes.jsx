@@ -29,11 +29,7 @@ const LoadingSpinner = () => (
 const router = createBrowserRouter([
     {
         path: '/',
-        element: (
-            <Suspense fallback={<LoadingSpinner />}>
-                <Layout />
-            </Suspense>
-        ),
+        element: <Layout />,
         children: [
             {
                 index: true,
