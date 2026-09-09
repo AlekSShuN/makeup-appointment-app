@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { API_BASE_URL } from '../lib/api.js';
+import { apiFetch } from '../lib/api.js';
 import { FALLBACK_SERVICES } from '../data/services.js';
 
 export const useServices = () => {
     return useQuery({
         queryKey: ['services'],
         queryFn: async () => {
-            const response = await fetch(`${API_BASE_URL}/services`);
+            const response = await apiFetch('/services');
 
             if (!response.ok) {
                 throw new Error('Failed to fetch services');

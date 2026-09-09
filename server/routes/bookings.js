@@ -10,10 +10,48 @@ import { checkAdminAuth } from '../middleware/auth.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DEFAULT_TIME_SLOTS = [
-    '06:00', '07:00', '08:00',
-    '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
-];
+const WORKDAY_START_MINUTES = 6 * 60;
+const WORKDAY_END_MINUTES = 20 * 60;
+const SLOT_STEP_MINUTES = 30;
+
+const timeToMinutes = (time) => {
+    const [hours, minutes] = String(time).split(':').map(Number);
+    return hours * 60 + minutes;
+};
+
+const minutesToTime = (minutes) => {
+    const hours = String(Math.floor(minutes / 60)).padStart(2, '0');
+    const mins = String(minutes % 60).padStart(2, '0');
+    return `${hours}:${mins}`;
+};
+
+const buildTimeSlots = () => {
+    const slots = [];
+    for (let minutes = WORKDAY_START_MINUTES; minutes < WORKDAY_END_MINUTES; minutes += SLOT_STEP_MINUTES) {
+        slots.push(minutesToTime(minutes));
+    }
+    return slots;
+};
+
+const DEFAULT_TIME_SLOTS = buildTimeSlots();
+
+const getServiceDuration = (services, serviceIds) => {
+    const ids = Array.isArray(serviceIds) ? serviceIds.map(String) : [String(serviceIds)];
+    const totalDuration = services
+        .filter((service) => ids.includes(String(service.id)))
+        .reduce((sum, service) => sum + Number(service.duration || 0), 0);
+
+    return totalDuration > 0 ? totalDuration : 60;
+};
+
+const normalizeServiceIds = (value) => (
+    Array.isArray(value) && value.length > 0
+        ? value.map(String)
+        : String(value || '')
+            .split(',')
+            .map((id) => id.trim())
+            .filter(Boolean)
+);
 
 // Роут для получения доступных слотов времени
 router.get('/booking-slots', async (req, res) => {
@@ -48,12 +86,31 @@ router.get('/booking-slots', async (req, res) => {
         }
 
         try {
-            const bookedSlots = db.prepare(`
-                SELECT time FROM bookings 
-                WHERE date = ?
-            `).all(date).map(row => row.time);
+            const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
+            const servicesData = await fs.readFile(servicesPath, 'utf8');
+            const services = JSON.parse(servicesData);
+            const requestedDuration = getServiceDuration(services, cleanServiceId);
 
-            const availableSlots = DEFAULT_TIME_SLOTS.filter(slot => !bookedSlots.includes(slot));
+            const bookedIntervals = db.prepare(`
+                SELECT time, service_id FROM bookings 
+                WHERE date = ?
+            `).all(date).map((row) => {
+                const bookedIds = normalizeServiceIds(row.service_id);
+                const start = timeToMinutes(row.time);
+                const duration = getServiceDuration(services, bookedIds);
+                return { start, end: start + duration };
+            });
+
+            const availableSlots = DEFAULT_TIME_SLOTS.filter((slot) => {
+                const start = timeToMinutes(slot);
+                const end = start + requestedDuration;
+
+                if (end > WORKDAY_END_MINUTES) {
+                    return false;
+                }
+
+                return bookedIntervals.every((interval) => end <= interval.start || start >= interval.end);
+            });
             console.log('✅ Available slots:', availableSlots);
             res.json(availableSlots);
         } catch (dbError) {
@@ -73,12 +130,7 @@ router.post('/', async (req, res) => {
 
         console.log('📝 Creating booking:', { serviceId, serviceIds, date, time, client, totalPrice });
 
-        const normalizedIds = Array.isArray(serviceIds) && serviceIds.length > 0
-            ? serviceIds.map(String)
-            : String(serviceId || '')
-                .split(',')
-                .map(id => id.trim())
-                .filter(Boolean);
+        const normalizedIds = normalizeServiceIds(serviceIds?.length ? serviceIds : serviceId);
 
         if (normalizedIds.length === 0 || !date || !time || !client || !client.name || !client.phone) {
             return res.status(400).json({
@@ -88,13 +140,34 @@ router.post('/', async (req, res) => {
         }
 
         const storedServiceId = normalizedIds.join(',');
+        const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
+        const servicesData = await fs.readFile(servicesPath, 'utf8');
+        const services = JSON.parse(servicesData);
+        const requestedDuration = getServiceDuration(services, normalizedIds);
+        const requestedStart = timeToMinutes(time);
+        const requestedEnd = requestedStart + requestedDuration;
 
-        const existingBooking = db.prepare(`
-            SELECT id FROM bookings 
-            WHERE date = ? AND time = ?
-        `).get(date, time);
+        if (requestedEnd > WORKDAY_END_MINUTES) {
+            return res.status(409).json({
+                success: false,
+                message: 'Выбранное время выходит за рамки рабочего дня'
+            });
+        }
 
-        if (existingBooking) {
+        const sameDayBookings = db.prepare(`
+            SELECT id, time, service_id FROM bookings 
+            WHERE date = ?
+        `).all(date);
+
+        const hasOverlap = sameDayBookings.some((booking) => {
+            const bookingStart = timeToMinutes(booking.time);
+            const bookingDuration = getServiceDuration(services, normalizeServiceIds(booking.service_id));
+            const bookingEnd = bookingStart + bookingDuration;
+
+            return requestedStart < bookingEnd && requestedEnd > bookingStart;
+        });
+
+        if (hasOverlap) {
             return res.status(409).json({
                 success: false,
                 message: 'Это время уже занято'
@@ -133,9 +206,6 @@ router.post('/', async (req, res) => {
         try {
             let service = null;
             try {
-                const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
-                const servicesData = await fs.readFile(servicesPath, 'utf8');
-                const services = JSON.parse(servicesData);
                 const matched = services.filter(s => normalizedIds.includes(String(s.id)));
                 const total = matched.reduce((sum, item) => sum + Number(item.price || 0), 0);
                 service = {

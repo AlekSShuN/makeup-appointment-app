@@ -2,18 +2,26 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import styles from './BookingForm.module.css';
 import { useValidation } from "../hooks/useValidation.js";
 import Calendar from './Calendar.jsx';
-import { API_BASE_URL } from '../lib/api.js';
+import { apiFetch } from '../lib/api.js';
 import { toLocalISODate } from '../lib/dates.js';
 
 const DEFAULT_SLOTS = [
-    '09:00', '10:00', '11:00', '12:00', '13:00',
-    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30',
 ];
 
 const SLOTS_TIMEOUT_MS = 8000;
+const WORKDAY_END_MINUTES = 20 * 60;
 
 const formatPrice = (value) =>
     `${Number(value || 0).toLocaleString('ru-RU')} ₽`;
+
+const timeToMinutes = (time) => {
+    const [hours, minutes] = String(time).split(':').map(Number);
+    return hours * 60 + minutes;
+};
 
 const BookingForm = ({ services = [], initialServiceId = '' }) => {
     const [selectedServiceIds, setSelectedServiceIds] = useState(() =>
@@ -46,7 +54,15 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         [selectedServices]
     );
 
-    const primaryServiceId = selectedServiceIds[0] || '';
+    const totalDurationMinutes = useMemo(() => {
+        const duration = selectedServices.reduce(
+            (sum, service) => sum + Number(service.durationMinutes || 0),
+            0
+        );
+        return duration > 0 ? duration : 60;
+    }, [selectedServices]);
+
+    const requestedServiceIds = selectedServiceIds.join(',');
 
     useEffect(() => {
         if (initialServiceId) {
@@ -68,12 +84,18 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         return slotDateTime < new Date();
     }, []);
 
-    const getLocalSlots = useCallback((date) => (
-        DEFAULT_SLOTS.filter(slot => !isPastTimeSlot(date, slot))
+    const getLocalSlots = useCallback((date, durationMinutes) => (
+        DEFAULT_SLOTS.filter((slot) => {
+            if (isPastTimeSlot(date, slot)) {
+                return false;
+            }
+
+            return timeToMinutes(slot) + durationMinutes <= WORKDAY_END_MINUTES;
+        })
     ), [isPastTimeSlot]);
 
-    const fetchSlots = useCallback(async (date, serviceId) => {
-        if (!date || !serviceId) {
+    const fetchSlots = useCallback(async (date, serviceIds) => {
+        if (!date || !serviceIds) {
             setAvailableSlots([]);
             setSlotsNotice('');
             setSlotsLoading(false);
@@ -92,13 +114,14 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         setSlotsLoading(true);
         setSlotsNotice('');
 
-        const localSlots = getLocalSlots(date);
+        const localSlots = getLocalSlots(date, totalDurationMinutes);
         setAvailableSlots(localSlots);
 
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`,
-                { signal: controller.signal }
+            const response = await apiFetch(
+                `/bookings/booking-slots?date=${date}&serviceId=${encodeURIComponent(serviceIds)}`,
+                { signal: controller.signal },
+                { timeoutMs: SLOTS_TIMEOUT_MS }
             );
 
             if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
@@ -113,7 +136,7 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
                     filteredSlots.length > 0
                         ? ''
                         : localSlots.length > 0
-                            ? 'Свободные слоты загружены локально. Подтвердим занятость при записи.'
+                            ? ''
                             : 'На эту дату нет свободного времени. Выберите другой день.'
                 );
             }
@@ -125,7 +148,7 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
                 setAvailableSlots(localSlots);
                 setSlotsNotice(
                     localSlots.length > 0
-                        ? 'Не удалось проверить занятость онлайн — показаны стандартные часы. Мы подтвердим время в сообщении.'
+                        ? ''
                         : 'На эту дату нет свободного времени. Выберите другой день.'
                 );
             }
@@ -135,7 +158,7 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
                 setSlotsLoading(false);
             }
         }
-    }, [getLocalSlots, isPastTimeSlot]);
+    }, [getLocalSlots, isPastTimeSlot, totalDurationMinutes]);
 
     useEffect(() => {
         return () => abortControllerRef.current?.abort();
@@ -165,15 +188,15 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
     }, [selectedDate, selectedTime, isPastTimeSlot, clearError]);
 
     useEffect(() => {
-        if (selectedDate && primaryServiceId) {
-            fetchSlots(selectedDate, primaryServiceId);
+        if (selectedDate && requestedServiceIds) {
+            fetchSlots(selectedDate, requestedServiceIds);
             return;
         }
 
         setAvailableSlots([]);
         setSlotsNotice('');
         setSlotsLoading(false);
-    }, [selectedDate, primaryServiceId, fetchSlots]);
+    }, [selectedDate, requestedServiceIds, fetchSlots]);
 
     const handleServiceToggle = useCallback((serviceId) => {
         const id = String(serviceId);
@@ -302,11 +325,14 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/bookings`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+            const response = await apiFetch(
+                '/bookings',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                },
+                { timeoutMs: 12000 }
+            );
 
             const result = await response.json().catch(() => ({}));
 

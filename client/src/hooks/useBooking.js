@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { API_BASE_URL } from '../lib/api.js';
+import { apiFetch } from '../lib/api.js';
 
 // Хук для проверки доступных слотов времени
 export const useAvailableSlots = (date, serviceId) => {
@@ -10,8 +10,8 @@ export const useAvailableSlots = (date, serviceId) => {
                 return [];
             }
 
-            const response = await fetch(
-                `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
+            const response = await apiFetch(
+                `/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
             );
 
             if (!response.ok) {
@@ -31,11 +31,8 @@ export const useCreateBooking = () => {
 
     return useMutation({
         mutationFn: async (bookingData) => {
-            const response = await fetch(`${API_BASE_URL}/bookings`, {
+            const response = await apiFetch('/bookings', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify(bookingData),
             });
 
