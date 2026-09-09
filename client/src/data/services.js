@@ -42,10 +42,10 @@ export const FALLBACK_SERVICES = [
     },
     {
         id: 4,
-        name: 'Локоны/Укладка',
-        title: 'Локоны/Укладка',
+        name: 'Локоны/Укладка/Прическа',
+        title: 'Локоны/Укладка/Прическа',
         price: 2000,
-        priceLabel: '2 000 ₽',
+        priceLabel: '2 000-2500 ₽',
         duration: '1 час',
         durationMinutes: 60,
         features: ['Волосы длиннее 45 см + 500 ₽ к прайсу'],
@@ -74,7 +74,7 @@ export const FALLBACK_SERVICES = [
         priceLabel: '5 000 ₽',
         duration: '3 часа',
         durationMinutes: 180,
-        features: ['Можно попробовать 2 макияжа и 2 прически'],
+        features: [],
         popular: false,
     },
     {
