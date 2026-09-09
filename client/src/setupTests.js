@@ -3,7 +3,6 @@ import '@testing-library/jest-dom';
 global.TextEncoder = require('util').TextEncoder;
 global.TextDecoder = require('util').TextDecoder;
 
-// Мок для fetch
 global.fetch = jest.fn(() =>
     Promise.resolve({
         ok: true,
@@ -11,15 +10,22 @@ global.fetch = jest.fn(() =>
     })
 );
 
-// мок для react-router-dom
-jest.mock('react-router-dom', () => ({
-    Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
-    useNavigate: () => jest.fn(),
-    useLocation: () => ({ pathname: '/' }),
-    BrowserRouter: ({ children }) => <div>{children}</div>
-}));
+jest.mock('react-router-dom', () => {
+        const DummyLink = ({ children, to, className, end, ...props }) => {
+            const resolved = typeof className === 'function' ? className({ isActive: false }) : className;
+            return <a href={to} className={resolved} {...props}>{children}</a>;
+        };
 
-// Мок для localStorage
+    return {
+        Link: DummyLink,
+        NavLink: DummyLink,
+        useNavigate: () => jest.fn(),
+        useLocation: () => ({ pathname: '/', state: null, search: '' }),
+        useSearchParams: () => [new URLSearchParams(), jest.fn()],
+        BrowserRouter: ({ children }) => <div>{children}</div>,
+    };
+});
+
 Object.defineProperty(window, 'localStorage', {
     value: {
         getItem: jest.fn(() => null),
@@ -29,4 +35,3 @@ Object.defineProperty(window, 'localStorage', {
     },
     writable: true
 });
-

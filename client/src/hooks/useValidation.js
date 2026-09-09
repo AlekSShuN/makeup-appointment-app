@@ -1,7 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
 
-const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
-
 const VALIDATION_RULES = {
     name: {
         minLength: 2,
@@ -94,7 +92,6 @@ export const useValidation = () => {
         if (formData.client) {
             newErrors.name = validateField('name', formData.client.name);
             newErrors.phone = validateField('phone', formData.client.phone);
-            newErrors.email = validateField('email', formData.client.email);
         }
 
         setErrors(newErrors);

@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import styles from './BookingForm.module.css';
 import { useValidation } from "../hooks/useValidation.js";
 import Calendar from './Calendar.jsx';
+import { API_BASE_URL } from '../lib/api.js';
+import { toLocalISODate } from '../lib/dates.js';
 
-const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
-
-const BookingForm = ({ services = [] }) => {
-    const [selectedService, setSelectedService] = useState('');
+const BookingForm = ({ services = [], initialServiceId = '' }) => {
+    const [selectedService, setSelectedService] = useState(String(initialServiceId || ''));
     const [selectedDate, setSelectedDate] = useState('');
     const [availableSlots, setAvailableSlots] = useState([]);
+    const [slotsLoading, setSlotsLoading] = useState(false);
+    const [slotsError, setSlotsError] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [clientData, setClientData] = useState({
         name: '',
@@ -22,11 +24,17 @@ const BookingForm = ({ services = [] }) => {
 
     const { errors, validateForm, clearError, clearAllErrors } = useValidation();
 
+    useEffect(() => {
+        if (initialServiceId) {
+            setSelectedService(String(initialServiceId));
+        }
+    }, [initialServiceId]);
+
     const isPastTimeSlot = useCallback((date, time) => {
         if (!date || !time) return false;
 
         const [hours, minutes] = time.split(':').map(Number);
-        const slotDateTime = new Date(date);
+        const slotDateTime = new Date(`${date}T00:00:00`);
         slotDateTime.setHours(hours, minutes, 0, 0);
 
         return slotDateTime < new Date();
@@ -35,38 +43,49 @@ const BookingForm = ({ services = [] }) => {
     const fetchSlots = useCallback(async (date, serviceId) => {
         if (!date || !serviceId) {
             setAvailableSlots([]);
+            setSlotsError('');
             return;
         }
+
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         setSelectedTime('');
-        setTimeout(async () => {
-            try {
-                const response = await fetch(
-                    `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
-                );
+        setSlotsLoading(true);
+        setSlotsError('');
 
-                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`,
+                { signal: controller.signal }
+            );
 
-                const slots = await response.json();
-                const filteredSlots = slots.filter(slot => !isPastTimeSlot(date, slot));
-                setAvailableSlots(filteredSlots);
+            if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
 
-            } catch (error) {
-                console.error('Error fetching slots:', error);
-                // Fallback на мок данные при ошибке
-                const mockSlots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
-                const filteredSlots = mockSlots.filter(slot => !isPastTimeSlot(date, slot));
-                setAvailableSlots(filteredSlots);
+            const slots = await response.json();
+            const filteredSlots = (Array.isArray(slots) ? slots : [])
+                .filter(slot => !isPastTimeSlot(date, slot));
+            setAvailableSlots(filteredSlots);
+            if (filteredSlots.length === 0) {
+                setSlotsError('На эту дату нет свободного времени. Выберите другой день.');
             }
-        }, 500);
-
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            setAvailableSlots([]);
+            setSlotsError('Не удалось загрузить свободное время. Попробуйте ещё раз.');
+        } finally {
+            if (!controller.signal.aborted) {
+                setSlotsLoading(false);
+            }
+        }
     }, [isPastTimeSlot]);
 
     useEffect(() => {
-        return () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-            }
-        };
+        return () => abortControllerRef.current?.abort();
     }, []);
 
     const validateFormDebounced = useCallback(() => {
@@ -80,7 +99,6 @@ const BookingForm = ({ services = [] }) => {
         }
     }, [selectedService, selectedDate, selectedTime, clientData, touched, validateForm]);
 
-    // Валидация с дебаунсингом
     useEffect(() => {
         const timeoutId = setTimeout(validateFormDebounced, 300);
         return () => clearTimeout(timeoutId);
@@ -127,53 +145,30 @@ const BookingForm = ({ services = [] }) => {
     }, []);
 
     const formatPhone = useCallback((value) => {
-        if (!value || !value.startsWith('+7')) {
-            return '+7';
-        }
-
-        const numbers = value.replace(/\D/g, '').slice(1);
+        const numbers = String(value || '').replace(/\D/g, '').replace(/^8/, '7');
+        const local = numbers.startsWith('7') ? numbers.slice(1) : numbers;
 
         let formattedValue = '+7';
-
-        if (numbers.length > 0) {
-            formattedValue += ' (' + numbers.slice(0, 3);
-        }
-        if (numbers.length > 3) {
-            formattedValue += ') ' + numbers.slice(3, 6);
-        }
-        if (numbers.length > 6) {
-            formattedValue += '-' + numbers.slice(6, 8);
-        }
-        if (numbers.length > 8) {
-            formattedValue += '-' + numbers.slice(8, 10);
-        }
-
+        if (local.length > 0) formattedValue += ' (' + local.slice(0, 3);
+        if (local.length > 3) formattedValue += ') ' + local.slice(3, 6);
+        if (local.length > 6) formattedValue += '-' + local.slice(6, 8);
+        if (local.length > 8) formattedValue += '-' + local.slice(8, 10);
         return formattedValue;
-    }, [])
+    }, []);
 
     const handlePhoneChange = useCallback((value) => {
-        if (!value.startsWith('+7')) {
-            handleInputChange('phone', '+7');
-            return;
-        }
-        const formattedPhone = formatPhone(value);
-        handleInputChange('phone', formattedPhone);
+        handleInputChange('phone', formatPhone(value));
     }, [formatPhone, handleInputChange]);
 
     const handlePhoneKeyDown = useCallback((e) => {
         const cursorPosition = e.target.selectionStart;
         if ((e.key === 'Backspace' || e.key === 'Delete') && cursorPosition <= 2) {
             e.preventDefault();
-            return;
-        }
-        if (!/[\d]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(e.key)) {
-            e.preventDefault();
         }
     }, []);
 
     const handleTimeSelect = useCallback((time) => {
         if (selectedDate && isPastTimeSlot(selectedDate, time)) {
-            clearError('time');
             return;
         }
 
@@ -185,18 +180,16 @@ const BookingForm = ({ services = [] }) => {
     const formSubmissionHandler = async (event) => {
         event.preventDefault();
 
-        const allTouchedFields = {
+        setTouched({
             serviceId: true,
             date: true,
             time: true,
             name: true,
             phone: true,
-        };
-        setTouched(allTouchedFields);
+        });
 
-        // Финальная проверка на прошедшее время
         if (selectedDate && selectedTime && isPastTimeSlot(selectedDate, selectedTime)) {
-            setSubmitMessage('❌ Выбранное время уже прошло. Пожалуйста, выберите другое время.');
+            setSubmitMessage('Выбранное время уже прошло. Пожалуйста, выберите другое время.');
             setSelectedTime('');
             return;
         }
@@ -208,19 +201,15 @@ const BookingForm = ({ services = [] }) => {
             client: clientData
         };
 
-        // Финальная валидация
         const isValid = validateForm(formData);
         if (!isValid) {
-            const firstErrorField = Object.keys(errors).find(field => errors[field]);
-            if (firstErrorField) {
-                const errorElement = document.querySelector(`[data-field="${firstErrorField}"]`);
-                if (errorElement) {
-                    errorElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }
+            requestAnimationFrame(() => {
+                const firstErrorField = Object.keys(errors).find(field => errors[field]);
+                const errorElement = firstErrorField
+                    ? document.querySelector(`[data-field="${firstErrorField}"]`)
+                    : document.querySelector(`.${styles.errorText}`);
+                errorElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
             return;
         }
 
@@ -230,19 +219,14 @@ const BookingForm = ({ services = [] }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/bookings`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
 
-            const result = await response.json();
+            const result = await response.json().catch(() => ({}));
 
             if (response.ok) {
-                setSubmitMessage('✅ Ваша заявка принята! Мы свяжемся с вами для подтверждения.');
-
-                const currentDate = selectedDate;
-                const currentService = selectedService;
+                setSubmitMessage('Ваша заявка принята! Мы свяжемся с вами для подтверждения.');
                 setSelectedService('');
                 setSelectedDate('');
                 setSelectedTime('');
@@ -250,17 +234,11 @@ const BookingForm = ({ services = [] }) => {
                 setTouched({});
                 clearAllErrors();
                 setAvailableSlots([]);
-
-                if (currentDate && currentService) {
-                    setTimeout(() => {
-                        fetchSlots(currentDate, currentService);
-                    }, 100);
-                }
             } else {
-                setSubmitMessage(`❌ Ошибка: ${result.message || 'Не удалось отправить заявку'}`);
+                setSubmitMessage(result.message || 'Не удалось отправить заявку');
             }
-        } catch (error) {
-            setSubmitMessage('❌ Ошибка сети. Пожалуйста, проверьте соединение и попробуйте еще раз!');
+        } catch {
+            setSubmitMessage('Ошибка сети. Проверьте соединение и попробуйте ещё раз.');
         } finally {
             setIsSubmitting(false);
         }
@@ -271,12 +249,15 @@ const BookingForm = ({ services = [] }) => {
         clientData.phone?.replace(/\D/g, '').length === 11 &&
         !isPastTimeSlot(selectedDate, selectedTime);
 
+    const isSuccess = submitMessage.includes('принята');
+
     return (
         <form onSubmit={formSubmissionHandler} className={styles.form} noValidate>
-            {/* Выбор услуги */}
             <div className={styles.form_group} data-field="serviceId">
-                <label className={styles.label}>Услуга:</label>
-                <select aria-label="Услуга"
+                <label className={styles.label} htmlFor="service">Услуга</label>
+                <select
+                    id="service"
+                    aria-label="Услуга"
                     value={selectedService}
                     onChange={(e) => handleServiceChange(e.target.value)}
                     onBlur={() => handleBlur('serviceId')}
@@ -286,7 +267,7 @@ const BookingForm = ({ services = [] }) => {
                     <option value="">Выберите услугу</option>
                     {services.map(service => (
                         <option key={service.id} value={service.id}>
-                            {service.name} ({service.price}руб.)
+                            {service.name || service.title} ({service.price} ₽)
                         </option>
                     ))}
                 </select>
@@ -295,14 +276,13 @@ const BookingForm = ({ services = [] }) => {
                 )}
             </div>
 
-            {/* Выбор даты */}
             <div className={styles.form_group} data-field="date">
-                <label className={styles.label}>Дата:</label>
+                <label className={styles.label}>Дата</label>
                 <Calendar
                     value={selectedDate}
                     onChange={handleDateChange}
                     onBlur={() => handleBlur('date')}
-                    minDate={new Date().toISOString().split('T')[0]}
+                    minDate={toLocalISODate(new Date())}
                     className={styles.calendar}
                     error={errors.date}
                     disabledDays={[]}
@@ -312,45 +292,42 @@ const BookingForm = ({ services = [] }) => {
                 )}
             </div>
 
-            {/* Выбор времени */}
-            {availableSlots.length > 0 && (
+            {(slotsLoading || slotsError || availableSlots.length > 0) && (
                 <div className={styles.form_group} data-field="time">
-                    <label className={styles.label}>Доступное время:</label>
-                    <div className={styles.time_slots}>
-                        {availableSlots.map(slot => {
-                            const isPast = isPastTimeSlot(selectedDate, slot);
-                            return (
+                    <label className={styles.label}>Доступное время</label>
+                    {slotsLoading && <p className={styles.hint}>Ищем свободные слоты...</p>}
+                    {slotsError && !slotsLoading && <p className={styles.hint}>{slotsError}</p>}
+                    {availableSlots.length > 0 && (
+                        <div className={styles.time_slots}>
+                            {availableSlots.map(slot => (
                                 <button
                                     key={slot}
                                     type="button"
-                                    className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''
-                                        } ${isPast ? styles.past_slot : ''}`}
-                                    onClick={() => !isPast && handleTimeSelect(slot)}
-                                    disabled={isPast}
-                                    title={isPast ? "Это время уже прошло" : ""}
+                                    className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''}`}
+                                    onClick={() => handleTimeSelect(slot)}
                                 >
                                     {slot}
-                                    {isPast && <span className={styles.past_badge}>прошло</span>}
                                 </button>
-                            );
-                        })}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                     {errors.time && (
                         <span className={styles.errorText}>{errors.time}</span>
                     )}
                 </div>
             )}
 
-            {/* Данные клиента */}
             <div className={styles.form_group} data-field="name">
-                <label className={styles.label}>Имя:</label>
+                <label className={styles.label} htmlFor="name">Имя</label>
                 <input
+                    id="name"
                     type="text"
                     value={clientData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     onBlur={() => handleBlur('name')}
                     className={`${styles.input} ${errors.name ? styles.error : ''}`}
                     placeholder="Введите ваше имя"
+                    autoComplete="name"
                     required
                 />
                 {errors.name && (
@@ -359,8 +336,9 @@ const BookingForm = ({ services = [] }) => {
             </div>
 
             <div className={styles.form_group} data-field="phone">
-                <label className={styles.label}>Телефон:</label>
+                <label className={styles.label} htmlFor="phone">Телефон</label>
                 <input
+                    id="phone"
                     type="tel"
                     value={clientData.phone}
                     onChange={(e) => handlePhoneChange(e.target.value)}
@@ -368,14 +346,11 @@ const BookingForm = ({ services = [] }) => {
                     onBlur={() => handleBlur('phone')}
                     className={`${styles.input} ${errors.phone ? styles.error : ''}`}
                     placeholder="+7 (999) 999-99-99"
+                    autoComplete="tel"
                     required
                     onPaste={(e) => {
                         e.preventDefault();
-                        const pastedText = e.clipboardData.getData('text');
-                        const numbers = pastedText.replace(/\D/g, '');
-                        if (numbers) {
-                            handlePhoneChange('+7' + numbers);
-                        }
+                        handlePhoneChange(e.clipboardData.getData('text'));
                     }}
                 />
                 {errors.phone && (
@@ -383,10 +358,10 @@ const BookingForm = ({ services = [] }) => {
                 )}
             </div>
 
-            {/* Комментарий */}
-            <div className={styles.form_group}>
-                <label className={styles.label}>Комментарий:</label>
+            <div className={`${styles.form_group} ${styles.optional}`}>
+                <label className={styles.label} htmlFor="comment">Комментарий</label>
                 <textarea
+                    id="comment"
                     value={clientData.comment}
                     onChange={(e) => handleInputChange('comment', e.target.value)}
                     className={styles.textarea}
@@ -395,7 +370,6 @@ const BookingForm = ({ services = [] }) => {
                 />
             </div>
 
-            {/* Кнопка отправки */}
             <button
                 className={styles.submit_button}
                 type="submit"
@@ -407,14 +381,12 @@ const BookingForm = ({ services = [] }) => {
                         Отправка...
                     </>
                 ) : (
-                    '📅 Записаться'
+                    'Записаться'
                 )}
             </button>
 
-            {/* Сообщение о результате */}
             {submitMessage && (
-                <div className={`${styles.message} ${submitMessage.includes('✅') ? styles.success : styles.error
-                    }`}>
+                <div className={`${styles.message} ${isSuccess ? styles.success : styles.error}`} role="status">
                     {submitMessage}
                 </div>
             )}

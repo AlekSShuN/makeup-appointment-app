@@ -1,13 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-
-const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
+import { API_BASE_URL } from '../lib/api.js';
+import { FALLBACK_SERVICES } from '../data/services.js';
 
 export const useServices = () => {
     return useQuery({
         queryKey: ['services'],
         queryFn: async () => {
-            console.log('🔍 Fetching services from API...');
-
             const response = await fetch(`${API_BASE_URL}/services`);
 
             if (!response.ok) {
@@ -15,11 +13,12 @@ export const useServices = () => {
             }
 
             const services = await response.json();
-            console.log('✅ Received services from API:', services);
-
-            return services;
+            return Array.isArray(services) && services.length > 0
+                ? services
+                : FALLBACK_SERVICES;
         },
         staleTime: 60 * 60 * 1000,
-        retry: 2,
+        retry: 1,
+        placeholderData: FALLBACK_SERVICES,
     });
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,15 +15,23 @@ const Header = () => {
         }
     }, []);
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
+    useEffect(() => {
+        document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isMenuOpen]);
 
-    const closeMenu = () => {
-        setIsMenuOpen(false);
-    };
+    useEffect(() => {
+        return () => {
+            if (clickTimerRef.current) {
+                clearTimeout(clickTimerRef.current);
+            }
+        };
+    }, []);
 
-    // Функция для скрытой активации по тройному клику на логотип
+    const closeMenu = () => setIsMenuOpen(false);
+
     const handleLogoClick = () => {
         setClickCount(prev => {
             const newCount = prev + 1;
@@ -35,9 +43,9 @@ const Header = () => {
             if (newCount >= 3) {
                 localStorage.setItem('adminAuth', 'true');
                 setIsAdmin(true);
-                alert('Админ-доступ активирован!');
                 return 0;
             }
+
             clickTimerRef.current = setTimeout(() => {
                 setClickCount(0);
             }, 1500);
@@ -49,43 +57,54 @@ const Header = () => {
     const logoutAdmin = () => {
         localStorage.removeItem('adminAuth');
         setIsAdmin(false);
-        alert('Вы вышли из админ-панели');
+        closeMenu();
     };
+
+    const navClass = ({ isActive }) =>
+        `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`;
 
     return (
         <header className={styles.header}>
             <div className={styles.logo}>
-                <Link to="/" onClick={(e) => {
-                    closeMenu();
-                    handleLogoClick();
-                }}>MISS_NADYA MAKEUP</Link>
+                <Link
+                    to="/"
+                    onClick={() => {
+                        closeMenu();
+                        handleLogoClick();
+                    }}
+                >
+                    MISS_NADYA MAKEUP
+                </Link>
             </div>
 
-            <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
+            <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`} aria-label="Основное меню">
                 <ul className={styles.navList}>
-                    <li><Link to="/" className={styles.navLink} onClick={closeMenu}>Главная</Link></li>
-                    <li><Link to="/services" className={styles.navLink} onClick={closeMenu}>Услуги</Link></li>
-                    <li><Link to="/portfolio" className={styles.navLink} onClick={closeMenu}>Портфолио</Link></li>
-                    <li><Link to="/contacts" className={styles.navLink} onClick={closeMenu}>Контакты</Link></li>
+                    <li><NavLink to="/" className={navClass} onClick={closeMenu} end>Главная</NavLink></li>
+                    <li><NavLink to="/services" className={navClass} onClick={closeMenu}>Услуги</NavLink></li>
+                    <li><NavLink to="/portfolio" className={navClass} onClick={closeMenu}>Портфолио</NavLink></li>
+                    <li><NavLink to="/contacts" className={navClass} onClick={closeMenu}>Контакты</NavLink></li>
                 </ul>
+                {isAdmin && (
+                    <div className={styles.mobileAdmin}>
+                        <Link to="/admin" className={styles.adminLink} onClick={closeMenu}>
+                            Админ-панель
+                        </Link>
+                        <button className={styles.logoutButton} onClick={logoutAdmin}>
+                            Выйти
+                        </button>
+                    </div>
+                )}
             </nav>
 
             <div className={styles.headerButtons}>
                 {isAdmin && (
                     <>
-                        <Link
-                            to="/admin"
-                            className={styles.adminLink}
-                            onClick={closeMenu}
-                        >
+                        <Link to="/admin" className={`${styles.adminLink} ${styles.desktopOnly}`} onClick={closeMenu}>
                             Админ-панель
                         </Link>
                         <button
-                            className={styles.logoutButton}
-                            onClick={() => {
-                                logoutAdmin();
-                                closeMenu();
-                            }}
+                            className={`${styles.logoutButton} ${styles.desktopOnly}`}
+                            onClick={logoutAdmin}
                         >
                             Выйти
                         </button>
@@ -98,8 +117,9 @@ const Header = () => {
 
             <button
                 className={`${styles.hamburger} ${isMenuOpen ? styles.hamburgerOpen : ''}`}
-                onClick={toggleMenu}
-                aria-label='Открыть меню'
+                onClick={() => setIsMenuOpen(open => !open)}
+                aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+                aria-expanded={isMenuOpen}
             >
                 <span></span>
                 <span></span>

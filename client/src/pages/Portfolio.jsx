@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import style from './Portfolio.module.css';
 
 const INITIAL_VISIBLE_COUNT = 6;
@@ -189,20 +189,29 @@ const Portfolio = () => {
     };
 
     const handleKeyDown = (e) => {
-        if (selectedImage) {
-            if (e.key === 'Escape') closeImage();
-            if (e.key === 'ArrowRight') navigateImage('next');
-            if (e.key === 'ArrowLeft') navigateImage('prev');
-        }
+        if (!selectedImage) return;
+        if (e.key === 'Escape') closeImage();
+        if (e.key === 'ArrowRight') navigateImage('next');
+        if (e.key === 'ArrowLeft') navigateImage('prev');
     };
+
+    useEffect(() => {
+        if (!selectedImage) return;
+        window.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [selectedImage]);
 
     return (
         <>
             <section className={style.portfolio}>
                 <div className={style.container}>
                     <div className={style.header}>
+                        <p className={style.eyebrow}>Галерея</p>
                         <h1 className={style.title}>Портфолио</h1>
-
                     </div>
 
                     <div className={style.gallery}>
@@ -214,7 +223,9 @@ const Portfolio = () => {
                             >
                                 <img
                                     src={item.image}
-                                    alt={`Портфолио ${item.id}`}
+                                    alt={`Работа визажиста ${item.id}`}
+                                    loading="lazy"
+                                    decoding="async"
                                     onError={(e) => {
                                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDMwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik0xMjUgOTVDMTI1IDk4Ljg2NiAxMjEuODY2IDEwMiAxMTggMTAyQzExNC4xMzQgMTAyIDExMSA5OC44NjYgMTExIDk1QzExMSA5MS4xMzQgMTE0LjEzNCA4OCAxMTggODhDMTIxLjg2NiA4OCAxMjUgOTEuMTM0IDEyNSA5NVoiIGZpbGw9IiNDOEM4QzgiLz4KPHRleHQgeD0iMTUwIiB5PSIxMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODgiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCI+0J7RgtC60LvRjtGH0LjRgtGMINC/0L7QtNGA0LDRhtC40Lg8L3RleHQ+Cjwvc3ZnPg==';
                                     }}

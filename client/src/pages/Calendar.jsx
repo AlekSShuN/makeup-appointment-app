@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import styles from './Calendar.module.css';
+import { toLocalISODate } from '../lib/dates.js';
 
 const MONTH_NAMES = [
     'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -92,14 +93,7 @@ const Calendar = ({
     const days = useMemo(() => getDaysInMonth(currentMonth), [currentMonth, getDaysInMonth]);
 
     const handleDateSelect = useCallback((date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-
-        console.log('Selected date:', date, 'Formatted:', formattedDate);
-
-        onChange(formattedDate);
+        onChange(toLocalISODate(date));
         setIsOpen(false);
         onBlur?.();
     }, [onChange, onBlur]);
@@ -233,7 +227,7 @@ const Calendar = ({
                                 key={index}
                                 type="button"
                                 className={`${styles.day} ${date ? (
-                                    value === date.toISOString().split('T')[0] ? styles.selected :
+                                    value === toLocalISODate(date) ? styles.selected :
                                         isDateDisabled(date) ? styles.disabled :
                                             styles.available
                                 ) : styles.empty
@@ -241,7 +235,7 @@ const Calendar = ({
                                 onClick={() => date && !isDateDisabled(date) && handleDateSelect(date)}
                                 disabled={!date || isDateDisabled(date)}
                                 aria-label={date ? date.toLocaleDateString('ru-RU') : 'Пустая ячейка'}
-                                aria-selected={value === date?.toISOString().split('T')[0]}
+                                aria-selected={date ? value === toLocalISODate(date) : false}
                             >
                                 {date ? date.getDate() : ''}
                             </button>

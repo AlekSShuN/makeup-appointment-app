@@ -2,14 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Header from '../Header';
 
-// Мок для react-router-dom прямо в тесте
-jest.mock('react-router-dom', () => ({
-    Link: ({ children, to, ...props }) => (
-        <a href={to} {...props}>{children}</a>
-    ),
-    useNavigate: () => jest.fn(),
-}));
-
 describe('Header Component', () => {
     beforeEach(() => {
         global.localStorage.getItem.mockClear();

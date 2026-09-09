@@ -1,15 +1,16 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import './ProtectedRoute.module.css';
+import styles from './ProtectedRoute.module.css';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { user, isLoading, hasRole } = useAuth();
 
     if (isLoading) {
         return (
-            <div className="protected-container">
-                <div className="protected-card">
-                    <div className="spinner"></div>
-                    <h2 className="protected-title">Проверка доступа...</h2>
+            <div className={styles['protected-container']}>
+                <div className={styles['protected-card']}>
+                    <div className={styles.spinner}></div>
+                    <h2 className={styles['protected-title']}>Проверка доступа...</h2>
                 </div>
             </div>
         );
@@ -17,16 +18,16 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
     if (!user) {
         return (
-            <div className="protected-container">
-                <div className="protected-card">
-                    <div className="protected-icon">🔐</div>
-                    <h2 className="protected-title">Требуется авторизация</h2>
-                    <p className="protected-subtitle">
+            <div className={styles['protected-container']}>
+                <div className={styles['protected-card']}>
+                    <div className={styles['protected-icon']}>🔐</div>
+                    <h2 className={styles['protected-title']}>Требуется авторизация</h2>
+                    <p className={styles['protected-subtitle']}>
                         Пожалуйста, войдите в систему для доступа к этой странице.
                     </p>
-                    <a href="/admin-login" className="protected-button">
+                    <Link to="/admin-login" className={styles['protected-button']}>
                         Войти в админ-панель
-                    </a>
+                    </Link>
                 </div>
             </div>
         );
@@ -34,11 +35,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
     if (requiredRole && !hasRole(requiredRole)) {
         return (
-            <div className="protected-container">
-                <div className="protected-card forbidden-card">
-                    <div className="protected-icon">⛔</div>
-                    <h2 className="protected-title">Недостаточно прав</h2>
-                    <p className="protected-subtitle">
+            <div className={styles['protected-container']}>
+                <div className={`${styles['protected-card']} ${styles['forbidden-card']}`}>
+                    <div className={styles['protected-icon']}>⛔</div>
+                    <h2 className={styles['protected-title']}>Недостаточно прав</h2>
+                    <p className={styles['protected-subtitle']}>
                         У вас нет доступа к этой странице.
                     </p>
                 </div>

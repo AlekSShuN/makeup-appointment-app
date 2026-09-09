@@ -3,11 +3,7 @@ import router from './routes.jsx';
 import './styles/global.css';
 
 function App() {
-    return (
-        <RouterProvider
-            router={router}
-            fallbackElement={<div>Загрузка приложения...</div>} />
-    );
+    return <RouterProvider router={router} />;
 }
 
 export default App;

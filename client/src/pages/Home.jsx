@@ -1,114 +1,88 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
-
+import { FEATURED_SERVICES } from '../data/services.js';
 
 const SLIDE_INTERVAL = 4000;
 
+const SLIDES = [
+    { image: "/slider/slider1.webp", alt: "Вечерний макияж" },
+    { image: "/slider/slider2.webp", alt: "Свадебный макияж" },
+    { image: "/slider/slider3.webp", alt: "Дневной макияж" },
+    { image: "/slider/slider6.webp", alt: "Макияж" },
+    { image: "/slider/slider4.webp", alt: "Макияж" },
+    { image: "/slider/slider5.webp", alt: "Макияж" },
+];
+
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
     const sectionRefs = useRef([]);
     const observerRef = useRef(null);
 
-    const slides = [
-        { image: "/slider/slider1.webp", alt: "Вечерний макияж" },
-        { image: "/slider/slider2.webp", alt: "Свадебный макияж" },
-        { image: "/slider/slider3.webp", alt: "Дневной макияж" },
-        { image: "/slider/slider6.webp", alt: "Макияж" },
-        { image: "/slider/slider4.webp", alt: "Макияж" },
-        { image: "/slider/slider5.webp", alt: "Макияж" },
-    ];
-
-    const preloadImages = useCallback(async () => {
-        const promises = slides.map(slide => {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.src = slide.image;
-                img.onload = resolve;
-                img.onerror = resolve;
-            });
-        });
-
-        await Promise.all(promises);
-        setIsLoading(false);
-    }, [slides]);
-
     useEffect(() => {
-        preloadImages();
-
         const slideTimer = setInterval(() => {
-            setCurrentSlide(prev => (prev === slides.length - 1 ? 0 : prev + 1));
+            setCurrentSlide(prev => (prev === SLIDES.length - 1 ? 0 : prev + 1));
         }, SLIDE_INTERVAL);
 
-        return () => {
-            clearInterval(slideTimer);
-            if (observerRef.current) {
-                observerRef.current.disconnect();
-            }
-        };
-    }, [preloadImages, slides.length]);
+        return () => clearInterval(slideTimer);
+    }, []);
 
     useEffect(() => {
-        if (isLoading) return;
-
         observerRef.current = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add(styles.visible);
+                        observerRef.current.unobserve(entry.target);
                     }
                 });
             },
-            { threshold: 0.1 }
+            { threshold: 0.12 }
         );
 
         sectionRefs.current.forEach(ref => {
             if (ref) observerRef.current.observe(ref);
         });
 
-        return () => {
-            if (observerRef.current) {
-                observerRef.current.disconnect();
-            }
-        };
-    }, [isLoading]);
+        return () => observerRef.current?.disconnect();
+    }, []);
 
     const addSectionRef = useCallback((el, index) => {
         sectionRefs.current[index] = el;
     }, []);
 
-    if (isLoading) {
-        return (
-            <div className={styles.loadingScreen}>
-                <div className={styles.beautyLoader}></div>
-            </div>
-        );
-    }
-
     return (
         <div className={styles.home}>
             <section ref={(el) => addSectionRef(el, 0)} className={styles.hero}>
                 <div className={styles.heroBackground}>
-                    <img
-                        src={slides[currentSlide].image}
-                        alt={slides[currentSlide].alt}
-                        className={styles.heroImage}
-                    />
+                    {SLIDES.map((slide, index) => (
+                        <img
+                            key={slide.image}
+                            src={slide.image}
+                            alt={slide.alt}
+                            className={`${styles.heroImage} ${index === currentSlide ? styles.heroImageActive : ''}`}
+                            fetchPriority={index === 0 ? 'high' : 'low'}
+                        />
+                    ))}
                     <div className={styles.heroOverlay}></div>
                 </div>
 
                 <div className={styles.heroContent}>
                     <div className={styles.heroText}>
+                        <p className={styles.heroEyebrow}>Miss Nadya Makeup</p>
                         <h1 className={styles.heroTitle}>
                             Визажист / hair-стилист
                         </h1>
                         <p className={styles.heroSubtitle}>
-                            Красота-это сила, а макияж то, что действительно её подчеркивает. Это женский секрет.
+                            Красота — это сила, а макияж то, что действительно её подчеркивает. Это женский секрет.
                         </p>
                         <div className={styles.heroButtons}>
-                            <a href="/services" className={styles.heroButtonPrimary}>
+                            <Link to="/booking" className={styles.heroButtonPrimary}>
                                 Записаться
-                            </a>
+                            </Link>
+                            <Link to="/portfolio" className={styles.heroButtonSecondary}>
+                                Смотреть работы
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -118,50 +92,27 @@ const Home = () => {
                 <div className={styles.container}>
                     <h2 className={styles.sectionTitle}>Популярные услуги</h2>
                     <div className={styles.servicesGrid}>
-                        <a href="/services#wedding" className={styles.serviceCard}>
-                            <div className={styles.imageContainer}>
-                                <img
-                                    src="/images/services/wedding-makeup.webp"
-                                    alt="Свадебный макияж"
-                                    className={styles.serviceImage}
-                                />
-                            </div>
-                            <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}>Свадебный образ</h3>
-                                <p className={styles.price}>6 000 ₽</p>
-                                <span className={styles.serviceDesc}>Идеальный образ для самого важного дня</span>
-                            </div>
-                        </a>
-
-                        <a href="/services#evening" className={styles.serviceCard}>
-                            <div className={styles.imageContainer}>
-                                <img
-                                    src="/images/services/evening-makeup.webp"
-                                    alt="Вечерний макияж"
-                                    className={styles.serviceImage}
-                                />
-                            </div>
-                            <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}>Вечерний макияж</h3>
-                                <p className={styles.price}>2 300 ₽</p>
-                                <span className={styles.serviceDesc}>Для особых мероприятий и выходов</span>
-                            </div>
-                        </a>
-
-                        <a href="/services#lesson" className={styles.serviceCard}>
-                            <div className={styles.imageContainer}>
-                                <img
-                                    src="/images/services/makeup-lesson.webp"
-                                    alt="Уроки макияжа"
-                                    className={styles.serviceImage}
-                                />
-                            </div>
-                            <div className={styles.serviceContent}>
-                                <h3 className={styles.serviceTitle}>Урок макияжа для себя</h3>
-                                <p className={styles.price}>4 500 ₽</p>
-                                <span className={styles.serviceDesc}>Научимся создавать идеальный образ</span>
-                            </div>
-                        </a>
+                        {FEATURED_SERVICES.map((service) => (
+                            <Link
+                                key={service.id}
+                                to={`/booking?service=${service.id}`}
+                                className={styles.serviceCard}
+                            >
+                                <div className={styles.imageContainer}>
+                                    <img
+                                        src={service.image}
+                                        alt={service.alt}
+                                        className={styles.serviceImage}
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div className={styles.serviceContent}>
+                                    <h3 className={styles.serviceTitle}>{service.title}</h3>
+                                    <p className={styles.price}>{service.price}</p>
+                                    <span className={styles.serviceDesc}>{service.desc}</span>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -170,7 +121,7 @@ const Home = () => {
                 <div className={styles.container}>
                     <div className={styles.aboutContent}>
                         <div className={styles.aboutImage}>
-                            <img src="/images/services/miss_nadya.webp" alt="Визажист Надежда" />
+                            <img src="/images/services/miss_nadya.webp" alt="Визажист Надежда" loading="lazy" />
                         </div>
                         <div className={styles.aboutText}>
                             <h2 className={styles.sectionTitle}>Обо мне</h2>
@@ -192,13 +143,13 @@ const Home = () => {
                     <div className={styles.testimonialsGrid}>
                         <div className={styles.testimonialCard}>
                             <div className={styles.quoteIcon}>❝</div>
-                            <p className={styles.testimonialText}>"Надежда сделала мой свадебный макияж. Я выглядела идеально и чувствовала себя уверенно весь день!"</p>
-                            <span className={styles.testimonialAuthor}>- Анастасия</span>
+                            <p className={styles.testimonialText}>Надежда сделала мой свадебный макияж. Я выглядела идеально и чувствовала себя уверенно весь день!</p>
+                            <span className={styles.testimonialAuthor}>Анастасия</span>
                         </div>
                         <div className={styles.testimonialCard}>
                             <div className={styles.quoteIcon}>❝</div>
-                            <p className={styles.testimonialText}>"Профессионал высшего класса! Уроки макияжа изменили мое отношение к косметике."</p>
-                            <span className={styles.testimonialAuthor}>- Екатерина</span>
+                            <p className={styles.testimonialText}>Профессионал высшего класса! Уроки макияжа изменили мое отношение к косметике.</p>
+                            <span className={styles.testimonialAuthor}>Екатерина</span>
                         </div>
                     </div>
                 </div>
@@ -208,7 +159,7 @@ const Home = () => {
                 <div className={styles.container}>
                     <div className={styles.pwaCard}>
                         <div className={styles.pwaHeader}>
-                            <h2 className={styles.pwaTitle}>📱 Установите наше приложение!</h2>
+                            <h2 className={styles.pwaTitle}>Установите приложение</h2>
                             <p className={styles.pwaSubtitle}>Быстрый доступ к записи без браузера</p>
                         </div>
 
@@ -216,7 +167,7 @@ const Home = () => {
                             <div className={styles.step}>
                                 <div className={styles.stepNumber}>1</div>
                                 <div className={styles.stepContent}>
-                                    <h3>Нажмите "Поделиться"</h3>
+                                    <h3>Нажмите «Поделиться»</h3>
                                     <p>В Safari найдите кнопку 📤 в нижней панели</p>
                                 </div>
                             </div>
@@ -224,7 +175,7 @@ const Home = () => {
                             <div className={styles.step}>
                                 <div className={styles.stepNumber}>2</div>
                                 <div className={styles.stepContent}>
-                                    <h3>Выберите "На экран «Домой»"</h3>
+                                    <h3>Выберите «На экран Домой»</h3>
                                     <p>Прокрутите меню вниз до этой опции</p>
                                 </div>
                             </div>
@@ -232,24 +183,9 @@ const Home = () => {
                             <div className={styles.step}>
                                 <div className={styles.stepNumber}>3</div>
                                 <div className={styles.stepContent}>
-                                    <h3>Нажмите "Добавить"</h3>
+                                    <h3>Нажмите «Добавить»</h3>
                                     <p>Приложение появится на главном экране</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className={styles.pwaBenefits}>
-                            <div className={styles.benefit}>
-                                <span className={styles.benefitIcon}>⚡</span>
-                                <span>Быстрая загрузка</span>
-                            </div>
-                            <div className={styles.benefit}>
-                                <span className={styles.benefitIcon}>📴</span>
-                                <span>Работает оффлайн</span>
-                            </div>
-                            <div className={styles.benefit}>
-                                <span className={styles.benefitIcon}>🔔</span>
-                                <span>Уведомления</span>
                             </div>
                         </div>
                     </div>

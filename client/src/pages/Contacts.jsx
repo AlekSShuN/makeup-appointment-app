@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Contact.module.css';
 
 import instagramIcon from '../assets/image/icons/instagram.png';
@@ -212,13 +213,13 @@ const Contacts = () => {
                 <div className={styles.ctaSection}>
                     <h3>Записаться онлайн</h3>
                     <p>Выберите удобное время и услугу</p>
-                    <a
-                        href="/booking"
+                    <Link
+                        to="/booking"
                         className={styles.bookingButton}
                         aria-label="Перейти к записи на услугу"
                     >
-                        📅 Записаться на образ
-                    </a>
+                        Записаться на образ
+                    </Link>
                 </div>
             </div>
         </section>

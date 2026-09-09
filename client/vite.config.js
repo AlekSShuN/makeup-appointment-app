@@ -5,7 +5,6 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
-
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -14,8 +13,8 @@ export default defineConfig({
         description: "Онлайн запись к профессиональному визажисту",
         start_url: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#ff69b4",
+        background_color: "#fff7f9",
+        theme_color: "#ff6b9d",
         icons: [
           {
             src: "./icons/icon-192x192.png",
@@ -35,6 +34,17 @@ export default defineConfig({
       }
     })
   ],
+  base: '/',
+  server: {
+    port: 3000,
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5002',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -44,5 +54,4 @@ export default defineConfig({
       }
     }
   },
-  base: './'
 })

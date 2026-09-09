@@ -3,27 +3,22 @@ import { lazy, Suspense } from "react";
 import Layout from "./component/Layout/Layout.jsx";
 import AdminLogin from './pages/AdminLogin.jsx';
 import ProtectedRoute from './component/ProtectedRoute/ProtectedRoute.jsx';
+import ErrorBoundary from './component/ErrorBoundary/ErrorBoundary.jsx';
+import Loader from './component/Loader/Loader.jsx';
 
-
-
-// Ленивые импорты
 const Home = lazy(() => import('./pages/Home.jsx'));
 const Services = lazy(() => import('./pages/Services.jsx'));
 const Portfolio = lazy(() => import('./pages/Portfolio.jsx'));
 const Contacts = lazy(() => import('./pages/Contacts.jsx'));
 const Booking = lazy(() => import('./pages/Booking.jsx'));
-const BookingManagement = lazy(() => import('./pages/BookingManagement.jsx'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel.jsx'));
 
-const LoadingSpinner = () => (
-    <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '200px'
-    }}>
-        <div>Загрузка страницы...</div>
-    </div>
+const withSuspense = (Component) => (
+    <ErrorBoundary>
+        <Suspense fallback={<Loader text="Загрузка страницы..." />}>
+            <Component />
+        </Suspense>
+    </ErrorBoundary>
 );
 
 const router = createBrowserRouter([
@@ -31,54 +26,20 @@ const router = createBrowserRouter([
         path: '/',
         element: <Layout />,
         children: [
+            { index: true, element: withSuspense(Home) },
+            { path: 'services', element: withSuspense(Services) },
+            { path: 'portfolio', element: withSuspense(Portfolio) },
+            { path: 'contacts', element: withSuspense(Contacts) },
+            { path: 'booking', element: withSuspense(Booking) },
             {
-                index: true,
+                path: 'admin',
                 element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Home />
-                    </Suspense>
+                    <ProtectedRoute>
+                        {withSuspense(AdminPanel)}
+                    </ProtectedRoute>
                 )
             },
-            {
-                path: 'services',
-                element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Services />
-                    </Suspense>
-                )
-            },
-            {
-                path: 'portfolio',
-                element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Portfolio />
-                    </Suspense>
-                )
-            },
-            {
-                path: 'contacts',
-                element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Contacts />
-                    </Suspense>
-                )
-            },
-            {
-                path: 'booking',
-                element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Booking />
-                    </Suspense>
-                )
-            },
-            {
-                path: '/admin',
-                element: <AdminPanel />
-            },
-            {
-                path: '/admin-login',
-                element: <AdminLogin />
-            }
+            { path: 'admin-login', element: <AdminLogin /> },
         ],
     },
 ]);

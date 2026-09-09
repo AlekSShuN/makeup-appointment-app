@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-const API_BASE_URL = 'https://makeup-appointment-app-backend.onrender.com/api';
+import { API_BASE_URL } from '../lib/api.js';
 
 // Хук для проверки доступных слотов времени
 export const useAvailableSlots = (date, serviceId) => {
@@ -11,8 +10,6 @@ export const useAvailableSlots = (date, serviceId) => {
                 return [];
             }
 
-            console.log('🔍 Fetching available slots for:', { date, serviceId });
-
             const response = await fetch(
                 `${API_BASE_URL}/bookings/booking-slots?date=${date}&serviceId=${serviceId}`
             );
@@ -21,10 +18,7 @@ export const useAvailableSlots = (date, serviceId) => {
                 throw new Error('Failed to fetch available slots');
             }
 
-            const slots = await response.json();
-            console.log('✅ Received available slots:', slots);
-
-            return slots;
+            return await response.json();
         },
         enabled: !!date && !!serviceId,
         staleTime: 2 * 60 * 1000,
@@ -37,8 +31,6 @@ export const useCreateBooking = () => {
 
     return useMutation({
         mutationFn: async (bookingData) => {
-            console.log('📝 Creating booking:', bookingData);
-
             const response = await fetch(`${API_BASE_URL}/bookings`, {
                 method: 'POST',
                 headers: {
@@ -55,7 +47,7 @@ export const useCreateBooking = () => {
             return await response.json();
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['availableSlots']);
+            queryClient.invalidateQueries({ queryKey: ['availableSlots'] });
         },
     });
 };

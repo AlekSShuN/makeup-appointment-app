@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { API_BASE_URL } from '../lib/api.js';
 
 const AuthContext = createContext();
 
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch('https://makeup-appointment-app-backend.onrender.com/api/auth/verify', {
+            const response = await fetch(`${API_BASE_URL}/auth/verify`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -58,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             console.log('🔐 Attempting login...');
-            const response = await fetch('https://makeup-appointment-app-backend.onrender.com/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

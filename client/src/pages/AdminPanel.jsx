@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminSidebar from '../component/AdminPanel/AdminSidebar';
 import BookingManagement from './BookingManagement';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../lib/api.js';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
@@ -27,7 +28,7 @@ const AdminPanel = () => {
         try {
             console.log('🔐 Fetching bookings...');
             setIsLoading(true);
-            const response = await authFetch('https://makeup-appointment-app-backend.onrender.com/api/bookings');
+            const response = await authFetch(`${API_BASE_URL}/bookings`);
 
             console.log('📡 Response status:', response.status);
 
@@ -59,7 +60,7 @@ const AdminPanel = () => {
     const handleDeleteBooking = async (bookingId) => {
         try {
             console.log('🗑️ Deleting booking:', bookingId);
-            const response = await authFetch(`https://makeup-appointment-app-backend.onrender.com/api/bookings/${bookingId}`, {
+            const response = await authFetch(`${API_BASE_URL}/bookings/${bookingId}`, {
                 method: 'DELETE'
             });
 

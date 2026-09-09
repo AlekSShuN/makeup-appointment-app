@@ -4,25 +4,26 @@
 }
 
 .calendarContainer:focus-within .input {
-    border-color: #007bff;
+    border-color: #ff6b9d;
     outline: none;
 }
 
-.calendarButton:focus {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
-}
-
+.calendarButton:focus,
 .navButton:focus,
 .day:focus,
 .todayButton:focus {
-    outline: 2px solid #007bff;
-    outline-offset: 1px;
+    outline: 2px solid #ff6b9d;
+    outline-offset: 2px;
 }
 
 .day.available:focus {
-    background-color: #007bff;
+    background-color: #ff6b9d;
     color: white;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #ff6b9d;
 }
 
 .calendarDropdown {
@@ -48,7 +49,7 @@
 
 .input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #ff6b9d;
 }
 
 .input.error {
@@ -147,12 +148,12 @@
 }
 
 .day.available:hover {
-    background-color: #007bff;
+    background-color: #ff6b9d;
     color: white;
 }
 
 .day.selected {
-    background-color: #007bff;
+    background-color: #ff6b9d;
     color: white;
 }
 
@@ -175,8 +176,8 @@
 
 .todayButton {
     background: none;
-    border: 1px solid #007bff;
-    color: #007bff;
+    border: 1px solid #ff6b9d;
+    color: #ff6b9d;
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -185,7 +186,7 @@
 }
 
 .todayButton:hover:not(:disabled) {
-    background-color: #007bff;
+    background-color: #ff6b9d;
     color: white;
 }
 

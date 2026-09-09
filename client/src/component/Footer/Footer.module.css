@@ -3,31 +3,15 @@
     padding: 2rem 0;
     margin-top: auto;
     border-top: 3px solid var(--accent-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--white);
     position: relative;
     text-align: center;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    width: 100%;
-}
-
-.footerContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.copyright {
+.footer p {
     margin: 0;
     font-size: 1rem;
     font-weight: 500;
-    text-align: center;
     line-height: 1.5;
 }
 
@@ -36,6 +20,7 @@
     justify-content: center;
     gap: 2rem;
     flex-wrap: wrap;
+    margin-top: 1.25rem;
 }
 
 .socialLink {
@@ -80,6 +65,9 @@
 }
 
 .socialLink img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
 
@@ -87,39 +75,9 @@
     transform: scale(1.1);
 }
 
-.additionalInfo {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-}
-
-.contactInfo {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-    line-height: 1.4;
-}
-
-.srOnly {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
 @media (max-width: 768px) {
     .footer {
         padding: 1.5rem 0;
-    }
-
-    .footerContent {
-        gap: 1.25rem;
     }
 
     .socials {
@@ -130,27 +88,11 @@
         width: 44px;
         height: 44px;
     }
-
-    .copyright {
-        font-size: 0.95rem;
-    }
-
-    .contactInfo {
-        font-size: 0.85rem;
-    }
 }
 
 @media (max-width: 480px) {
     .footer {
         padding: 1.25rem 0;
-    }
-
-    .container {
-        padding: 0 15px;
-    }
-
-    .footerContent {
-        gap: 1rem;
     }
 
     .socials {
@@ -167,29 +109,7 @@
         height: 20px;
     }
 
-    .copyright {
+    .footer p {
         font-size: 0.9rem;
-    }
-
-    .additionalInfo {
-        margin-top: 1.25rem;
-        padding-top: 1.25rem;
-    }
-}
-
-/* Очень маленькие экраны */
-@media (max-width: 360px) {
-    .socials {
-        gap: 1rem;
-    }
-
-    .socialLink {
-        width: 36px;
-        height: 36px;
-    }
-
-    .socialLink img {
-        width: 18px;
-        height: 18px;
     }
 }

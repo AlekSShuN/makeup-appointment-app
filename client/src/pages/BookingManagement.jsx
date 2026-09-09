@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BookingList from '../component/AdminPanel/BookingList.jsx';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../lib/api.js';
 import styles from './BookingManagement.module.css';
 
 const BookingManagement = ({ bookings, onDeleteBooking, onRefresh, error }) => {
@@ -21,7 +22,7 @@ const BookingManagement = ({ bookings, onDeleteBooking, onRefresh, error }) => {
 
                 console.log('🗑️ Deleting booking:', bookingId);
 
-                const response = await authFetch(`https://makeup-appointment-app-backend.onrender.com/api/bookings/${bookingId}`, {
+                const response = await authFetch(`${API_BASE_URL}/bookings/${bookingId}`, {
                     method: 'DELETE',
                 });
 
