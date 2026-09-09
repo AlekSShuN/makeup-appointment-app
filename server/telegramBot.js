@@ -37,6 +37,7 @@ export const sendTelegramNotification = async (bookingData, service) => {
 🎉 Новая запись!
 
 Услуга: ${service?.name || 'Не указана'}
+${service?.price != null ? `Сумма: ${Number(service.price).toLocaleString('ru-RU')} ₽` : ''}
 Дата: ${bookingData.date}
 Время: ${bookingData.time}
 

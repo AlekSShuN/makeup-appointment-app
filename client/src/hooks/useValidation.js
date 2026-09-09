@@ -30,7 +30,11 @@ export const useValidation = () => {
 
         switch (name) {
             case 'serviceId':
-                if (!value) error = ERROR_MESSAGES.REQUIRED;
+                if (Array.isArray(value)) {
+                    if (value.length === 0) error = ERROR_MESSAGES.REQUIRED;
+                } else if (!value) {
+                    error = ERROR_MESSAGES.REQUIRED;
+                }
                 break;
 
             case 'date':

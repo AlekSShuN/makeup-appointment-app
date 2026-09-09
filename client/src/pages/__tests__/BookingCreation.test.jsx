@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import BookingForm from '../BookingForm';
 
-// Простой мок без react-query
 jest.mock('../../hooks/useBooking', () => ({
     useCreateBooking: () => ({
         mutate: jest.fn(),
@@ -23,7 +22,7 @@ describe('Booking Creation - Simple', () => {
     test('renders booking form with services', () => {
         render(<BookingForm services={mockServices} />);
 
-        expect(screen.getByText(/услуга/i)).toBeInTheDocument();
+        expect(screen.getByText(/^услуги$/i)).toBeInTheDocument();
         expect(screen.getByText(/стрижка/i)).toBeInTheDocument();
         expect(screen.getByText(/окрашивание/i)).toBeInTheDocument();
     });
@@ -31,7 +30,7 @@ describe('Booking Creation - Simple', () => {
     test('submit button is disabled when form is empty', () => {
         render(<BookingForm services={mockServices} />);
 
-        const submitButton = screen.getByText(/записаться/i);
+        const submitButton = screen.getByRole('button', { name: /записаться/i });
         expect(submitButton).toBeDisabled();
     });
 });

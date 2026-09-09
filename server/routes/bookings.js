@@ -10,6 +10,11 @@ import { checkAdminAuth } from '../middleware/auth.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const DEFAULT_TIME_SLOTS = [
+    '06:00', '07:00', '08:00',
+    '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
+];
+
 // Роут для получения доступных слотов времени
 router.get('/booking-slots', async (req, res) => {
     try {
@@ -17,7 +22,6 @@ router.get('/booking-slots', async (req, res) => {
 
         console.log('📅 Getting slots for:', { date, serviceId, query: req.query });
 
-        // Упрощенная валидация
         if (!date || !serviceId) {
             console.log('❌ Missing parameters:', { date, serviceId });
             return res.status(400).json({
@@ -36,69 +40,54 @@ router.get('/booking-slots', async (req, res) => {
         }
 
         const cleanServiceId = serviceId.toString().trim();
-        console.log('🔍 Clean serviceId:', cleanServiceId);
-
         if (cleanServiceId === '') {
-            console.log('❌ Empty serviceId');
             return res.status(400).json({
                 error: 'Service ID cannot be empty',
                 received: serviceId
             });
         }
 
-        console.log('🔍 Querying database with:', { date, cleanServiceId });
-
         try {
             const bookedSlots = db.prepare(`
-        SELECT time FROM bookings 
-        WHERE date = ?
-    `).all(date).map(row => row.time);
+                SELECT time FROM bookings 
+                WHERE date = ?
+            `).all(date).map(row => row.time);
 
-            console.log('📊 Booked slots:', bookedSlots);
-
-            const allTimeSlots = [
-                '06:00', '07:00', '08:00',
-                '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
-            ];
-
-            const availableSlots = allTimeSlots.filter(slot => !bookedSlots.includes(slot));
-
+            const availableSlots = DEFAULT_TIME_SLOTS.filter(slot => !bookedSlots.includes(slot));
             console.log('✅ Available slots:', availableSlots);
             res.json(availableSlots);
-
         } catch (dbError) {
             console.error('❌ Database error:', dbError);
-            const allTimeSlots = [
-                '06:00', '07:00', '08:00',
-                '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
-            ];
-            res.json(allTimeSlots);
+            res.json(DEFAULT_TIME_SLOTS);
         }
-
     } catch (error) {
         console.error('❌ Error in booking-slots:', error);
-
-        const allTimeSlots = [
-            '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-            '18:00', '19:00'
-        ];
-        res.json(allTimeSlots);
+        res.json(DEFAULT_TIME_SLOTS);
     }
 });
 
 // Роут для создания бронирования
 router.post('/', async (req, res) => {
     try {
-        const { serviceId, date, time, client } = req.body;
+        const { serviceId, serviceIds, date, time, client, totalPrice } = req.body;
 
-        console.log('📝 Creating booking:', { serviceId, date, time, client });
+        console.log('📝 Creating booking:', { serviceId, serviceIds, date, time, client, totalPrice });
 
-        if (!serviceId || !date || !time || !client || !client.name || !client.phone) {
+        const normalizedIds = Array.isArray(serviceIds) && serviceIds.length > 0
+            ? serviceIds.map(String)
+            : String(serviceId || '')
+                .split(',')
+                .map(id => id.trim())
+                .filter(Boolean);
+
+        if (normalizedIds.length === 0 || !date || !time || !client || !client.name || !client.phone) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields'
             });
         }
+
+        const storedServiceId = normalizedIds.join(',');
 
         const existingBooking = db.prepare(`
             SELECT id FROM bookings 
@@ -118,7 +107,7 @@ router.post('/', async (req, res) => {
         `);
 
         const result = stmt.run(
-            String(serviceId),
+            storedServiceId,
             date,
             time,
             client.name.trim(),
@@ -130,9 +119,10 @@ router.post('/', async (req, res) => {
         console.log('✅ Booking created with ID:', bookingId);
 
         const bookingData = {
-            bookingId: bookingId,
-            date: date,
-            time: time,
+            bookingId,
+            date,
+            time,
+            totalPrice: totalPrice || null,
             client: {
                 name: client.name,
                 phone: client.phone,
@@ -140,30 +130,24 @@ router.post('/', async (req, res) => {
             }
         };
 
-        console.log('📤 Prepared Telegram data:', bookingData);
-
         try {
             let service = null;
             try {
                 const servicesPath = path.join(__dirname, '..', 'data', 'services.json');
                 const servicesData = await fs.readFile(servicesPath, 'utf8');
                 const services = JSON.parse(servicesData);
-                service = services.find(s => s.id == serviceId);
-                console.log('🔍 Found service:', service);
+                const matched = services.filter(s => normalizedIds.includes(String(s.id)));
+                const total = matched.reduce((sum, item) => sum + Number(item.price || 0), 0);
+                service = {
+                    name: matched.map(item => item.name).join(', ') || `Услуги: ${storedServiceId}`,
+                    price: totalPrice ?? total,
+                };
             } catch (serviceError) {
                 console.log('⚠️ Could not load service info:', serviceError.message);
-                service = { name: `Услуга ID: ${serviceId}` };
+                service = { name: `Услуги: ${storedServiceId}`, price: totalPrice };
             }
 
-            console.log('🚀 Calling sendTelegramNotification...');
-            const telegramResult = await sendTelegramNotification(bookingData, service);
-
-            if (telegramResult) {
-                console.log('✅ Telegram notification sent successfully!');
-            } else {
-                console.log('❌ Telegram notification failed');
-            }
-
+            await sendTelegramNotification(bookingData, service);
         } catch (telegramError) {
             console.error('❌ Failed to send Telegram notification:', telegramError);
         }
@@ -171,9 +155,8 @@ router.post('/', async (req, res) => {
         res.status(201).json({
             success: true,
             message: '✅ Запись успешно создана! Мы свяжемся с вами для подтверждения.',
-            bookingId: bookingId
+            bookingId
         });
-
     } catch (error) {
         console.error('❌ Error creating booking:', error);
         res.status(500).json({
@@ -183,7 +166,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Роут для получения всех бронирований (для админки)
 router.get('/', checkAdminAuth, async (req, res) => {
     try {
         const bookings = db.prepare(`
@@ -191,7 +173,6 @@ router.get('/', checkAdminAuth, async (req, res) => {
             ORDER BY date DESC, time DESC
         `).all();
 
-        console.log('📋 Retrieved bookings:', bookings.length);
         res.json(bookings);
     } catch (error) {
         console.error('❌ Error reading bookings:', error);
@@ -199,7 +180,6 @@ router.get('/', checkAdminAuth, async (req, res) => {
     }
 });
 
-//Роут получения конкретной брони
 router.get('/:id', checkAdminAuth, async (req, res) => {
     try {
         const booking = db.prepare(`
@@ -220,9 +200,6 @@ router.get('/:id', checkAdminAuth, async (req, res) => {
 router.delete('/:id', checkAdminAuth, async (req, res) => {
     try {
         const { id } = req.params;
-
-        console.log('🗑️ Deleting booking with ID:', id);
-
         const existingBooking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(id);
 
         if (!existingBooking) {
@@ -235,14 +212,12 @@ router.delete('/:id', checkAdminAuth, async (req, res) => {
         const stmt = db.prepare('DELETE FROM bookings WHERE id = ?');
         const result = stmt.run(id);
 
-        console.log('✅ Booking deleted successfully, changes:', result.changes);
-
         res.json({
             success: true,
             message: 'Запись успешно удалена',
-            deletedId: id
+            deletedId: id,
+            changes: result.changes
         });
-
     } catch (error) {
         console.error('❌ Error deleting booking:', error);
         res.status(500).json({

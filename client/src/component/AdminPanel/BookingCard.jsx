@@ -7,7 +7,14 @@ const BookingCard = ({ booking, onCancel }) => {
     // Используем правильные поля из сервера
     const customerName = booking.client_name || 'Не указано';
     const phone = booking.client_phone || 'Не указано';
-    const serviceName = booking.service_name || `Услуга #${booking.service_id}`;
+    const serviceName = booking.service_name
+        || String(booking.service_id || '')
+            .split(',')
+            .map(id => id.trim())
+            .filter(Boolean)
+            .map(id => `Услуга #${id}`)
+            .join(', ')
+        || 'Не указано';
     const comment = booking.client_comment || booking.comment;
 
     return (

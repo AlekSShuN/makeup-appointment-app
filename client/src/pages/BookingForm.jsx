@@ -1,16 +1,28 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import styles from './BookingForm.module.css';
 import { useValidation } from "../hooks/useValidation.js";
 import Calendar from './Calendar.jsx';
 import { API_BASE_URL } from '../lib/api.js';
 import { toLocalISODate } from '../lib/dates.js';
 
+const DEFAULT_SLOTS = [
+    '09:00', '10:00', '11:00', '12:00', '13:00',
+    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
+];
+
+const SLOTS_TIMEOUT_MS = 8000;
+
+const formatPrice = (value) =>
+    `${Number(value || 0).toLocaleString('ru-RU')} ₽`;
+
 const BookingForm = ({ services = [], initialServiceId = '' }) => {
-    const [selectedService, setSelectedService] = useState(String(initialServiceId || ''));
+    const [selectedServiceIds, setSelectedServiceIds] = useState(() =>
+        initialServiceId ? [String(initialServiceId)] : []
+    );
     const [selectedDate, setSelectedDate] = useState('');
     const [availableSlots, setAvailableSlots] = useState([]);
     const [slotsLoading, setSlotsLoading] = useState(false);
-    const [slotsError, setSlotsError] = useState('');
+    const [slotsNotice, setSlotsNotice] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [clientData, setClientData] = useState({
         name: '',
@@ -24,9 +36,25 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
 
     const { errors, validateForm, clearError, clearAllErrors } = useValidation();
 
+    const selectedServices = useMemo(
+        () => services.filter(service => selectedServiceIds.includes(String(service.id))),
+        [services, selectedServiceIds]
+    );
+
+    const totalPrice = useMemo(
+        () => selectedServices.reduce((sum, service) => sum + Number(service.price || 0), 0),
+        [selectedServices]
+    );
+
+    const primaryServiceId = selectedServiceIds[0] || '';
+
     useEffect(() => {
         if (initialServiceId) {
-            setSelectedService(String(initialServiceId));
+            setSelectedServiceIds(prev =>
+                prev.includes(String(initialServiceId))
+                    ? prev
+                    : [String(initialServiceId), ...prev]
+            );
         }
     }, [initialServiceId]);
 
@@ -40,10 +68,15 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         return slotDateTime < new Date();
     }, []);
 
+    const getLocalSlots = useCallback((date) => (
+        DEFAULT_SLOTS.filter(slot => !isPastTimeSlot(date, slot))
+    ), [isPastTimeSlot]);
+
     const fetchSlots = useCallback(async (date, serviceId) => {
         if (!date || !serviceId) {
             setAvailableSlots([]);
-            setSlotsError('');
+            setSlotsNotice('');
+            setSlotsLoading(false);
             return;
         }
 
@@ -53,10 +86,14 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
 
         const controller = new AbortController();
         abortControllerRef.current = controller;
+        const timeoutId = setTimeout(() => controller.abort(), SLOTS_TIMEOUT_MS);
 
         setSelectedTime('');
         setSlotsLoading(true);
-        setSlotsError('');
+        setSlotsNotice('');
+
+        const localSlots = getLocalSlots(date);
+        setAvailableSlots(localSlots);
 
         try {
             const response = await fetch(
@@ -69,20 +106,36 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
             const slots = await response.json();
             const filteredSlots = (Array.isArray(slots) ? slots : [])
                 .filter(slot => !isPastTimeSlot(date, slot));
-            setAvailableSlots(filteredSlots);
-            if (filteredSlots.length === 0) {
-                setSlotsError('На эту дату нет свободного времени. Выберите другой день.');
+
+            if (!controller.signal.aborted) {
+                setAvailableSlots(filteredSlots.length > 0 ? filteredSlots : localSlots);
+                setSlotsNotice(
+                    filteredSlots.length > 0
+                        ? ''
+                        : localSlots.length > 0
+                            ? 'Свободные слоты загружены локально. Подтвердим занятость при записи.'
+                            : 'На эту дату нет свободного времени. Выберите другой день.'
+                );
             }
         } catch (error) {
-            if (error.name === 'AbortError') return;
-            setAvailableSlots([]);
-            setSlotsError('Не удалось загрузить свободное время. Попробуйте ещё раз.');
+            if (error.name === 'AbortError' && abortControllerRef.current !== controller) {
+                return;
+            }
+            if (!controller.signal.aborted || abortControllerRef.current === controller) {
+                setAvailableSlots(localSlots);
+                setSlotsNotice(
+                    localSlots.length > 0
+                        ? 'Не удалось проверить занятость онлайн — показаны стандартные часы. Мы подтвердим время в сообщении.'
+                        : 'На эту дату нет свободного времени. Выберите другой день.'
+                );
+            }
         } finally {
-            if (!controller.signal.aborted) {
+            clearTimeout(timeoutId);
+            if (abortControllerRef.current === controller) {
                 setSlotsLoading(false);
             }
         }
-    }, [isPastTimeSlot]);
+    }, [getLocalSlots, isPastTimeSlot]);
 
     useEffect(() => {
         return () => abortControllerRef.current?.abort();
@@ -91,13 +144,13 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
     const validateFormDebounced = useCallback(() => {
         if (Object.keys(touched).length > 0) {
             validateForm({
-                serviceId: selectedService,
+                serviceId: selectedServiceIds,
                 date: selectedDate,
                 time: selectedTime,
                 client: clientData
             });
         }
-    }, [selectedService, selectedDate, selectedTime, clientData, touched, validateForm]);
+    }, [selectedServiceIds, selectedDate, selectedTime, clientData, touched, validateForm]);
 
     useEffect(() => {
         const timeoutId = setTimeout(validateFormDebounced, 300);
@@ -111,28 +164,42 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         }
     }, [selectedDate, selectedTime, isPastTimeSlot, clearError]);
 
-    const handleServiceChange = useCallback((serviceId) => {
-        setSelectedService(serviceId);
-        setSelectedTime('');
-        setAvailableSlots([]);
-        setTouched(prev => ({ ...prev, serviceId: true }));
-        clearError('serviceId');
-
-        if (selectedDate && serviceId) {
-            fetchSlots(selectedDate, serviceId);
+    useEffect(() => {
+        if (selectedDate && primaryServiceId) {
+            fetchSlots(selectedDate, primaryServiceId);
+            return;
         }
-    }, [selectedDate, fetchSlots, clearError]);
+
+        setAvailableSlots([]);
+        setSlotsNotice('');
+        setSlotsLoading(false);
+    }, [selectedDate, primaryServiceId, fetchSlots]);
+
+    const handleServiceToggle = useCallback((serviceId) => {
+        const id = String(serviceId);
+        setSelectedServiceIds(prev => {
+            const next = prev.includes(id)
+                ? prev.filter(item => item !== id)
+                : [...prev, id];
+
+            if (next.length === 0) {
+                setSelectedTime('');
+                setAvailableSlots([]);
+                setSlotsNotice('');
+            }
+
+            return next;
+        });
+        setTouched(state => ({ ...state, serviceId: true }));
+        clearError('serviceId');
+    }, [clearError]);
 
     const handleDateChange = useCallback((date) => {
         setSelectedDate(date);
         setSelectedTime('');
         setTouched(prev => ({ ...prev, date: true }));
         clearError('date');
-
-        if (date && selectedService) {
-            fetchSlots(date, selectedService);
-        }
-    }, [selectedService, fetchSlots, clearError]);
+    }, [clearError]);
 
     const handleInputChange = useCallback((field, value) => {
         setClientData(prev => ({ ...prev, [field]: value }));
@@ -195,7 +262,7 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         }
 
         const formData = {
-            serviceId: selectedService,
+            serviceId: selectedServiceIds,
             date: selectedDate,
             time: selectedTime,
             client: clientData
@@ -204,10 +271,7 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         const isValid = validateForm(formData);
         if (!isValid) {
             requestAnimationFrame(() => {
-                const firstErrorField = Object.keys(errors).find(field => errors[field]);
-                const errorElement = firstErrorField
-                    ? document.querySelector(`[data-field="${firstErrorField}"]`)
-                    : document.querySelector(`.${styles.errorText}`);
+                const errorElement = document.querySelector(`.${styles.errorText}`);
                 errorElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
             return;
@@ -216,24 +280,46 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         setIsSubmitting(true);
         setSubmitMessage('');
 
+        const serviceNames = selectedServices
+            .map(service => service.name || service.title)
+            .join(', ');
+
+        const payload = {
+            serviceId: selectedServiceIds.join(','),
+            serviceIds: selectedServiceIds.map(Number),
+            date: selectedDate,
+            time: selectedTime,
+            totalPrice,
+            client: {
+                ...clientData,
+                comment: [
+                    clientData.comment?.trim(),
+                    selectedServices.length > 1
+                        ? `Услуги: ${serviceNames}. Итого: ${formatPrice(totalPrice)}`
+                        : '',
+                ].filter(Boolean).join('\n'),
+            },
+        };
+
         try {
             const response = await fetch(`${API_BASE_URL}/bookings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
             const result = await response.json().catch(() => ({}));
 
             if (response.ok) {
                 setSubmitMessage('Ваша заявка принята! Мы свяжемся с вами для подтверждения.');
-                setSelectedService('');
+                setSelectedServiceIds([]);
                 setSelectedDate('');
                 setSelectedTime('');
                 setClientData({ name: '', phone: '', comment: '' });
                 setTouched({});
                 clearAllErrors();
                 setAvailableSlots([]);
+                setSlotsNotice('');
             } else {
                 setSubmitMessage(result.message || 'Не удалось отправить заявку');
             }
@@ -244,37 +330,67 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
         }
     };
 
-    const isFormValid = selectedService && selectedDate && selectedTime &&
+    const isFormValid = selectedServiceIds.length > 0 && selectedDate && selectedTime &&
         clientData.name?.trim() &&
         clientData.phone?.replace(/\D/g, '').length === 11 &&
         !isPastTimeSlot(selectedDate, selectedTime);
 
     const isSuccess = submitMessage.includes('принята');
+    const showTimeSection = selectedServiceIds.length > 0 && selectedDate;
 
     return (
         <form onSubmit={formSubmissionHandler} className={styles.form} noValidate>
             <div className={styles.form_group} data-field="serviceId">
-                <label className={styles.label} htmlFor="service">Услуга</label>
-                <select
-                    id="service"
-                    aria-label="Услуга"
-                    value={selectedService}
-                    onChange={(e) => handleServiceChange(e.target.value)}
-                    onBlur={() => handleBlur('serviceId')}
-                    className={`${styles.select} ${errors.serviceId ? styles.error : ''}`}
-                    required
-                >
-                    <option value="">Выберите услугу</option>
-                    {services.map(service => (
-                        <option key={service.id} value={service.id}>
-                            {service.name || service.title} ({service.price} ₽)
-                        </option>
-                    ))}
-                </select>
+                <span className={styles.label}>Услуги</span>
+                <p className={styles.hint}>Можно выбрать несколько — итоговая сумма обновится сразу</p>
+                <div className={styles.servicesList} role="group" aria-label="Услуги">
+                    {services.map(service => {
+                        const id = String(service.id);
+                        const checked = selectedServiceIds.includes(id);
+                        return (
+                            <label
+                                key={id}
+                                className={`${styles.serviceOption} ${checked ? styles.serviceOptionActive : ''}`}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => handleServiceToggle(id)}
+                                    onBlur={() => handleBlur('serviceId')}
+                                />
+                                <span className={styles.serviceOptionBody}>
+                                    <span className={styles.serviceOptionName}>
+                                        {service.name || service.title}
+                                    </span>
+                                    <span className={styles.serviceOptionPrice}>
+                                        {formatPrice(service.price)}
+                                    </span>
+                                </span>
+                            </label>
+                        );
+                    })}
+                </div>
                 {errors.serviceId && (
                     <span className={styles.errorText}>{errors.serviceId}</span>
                 )}
             </div>
+
+            {selectedServices.length > 0 && (
+                <div className={styles.totalCard} aria-live="polite">
+                    <div className={styles.totalList}>
+                        {selectedServices.map(service => (
+                            <div key={service.id} className={styles.totalRow}>
+                                <span>{service.name || service.title}</span>
+                                <span>{formatPrice(service.price)}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.totalSum}>
+                        <span>Итого</span>
+                        <strong>{formatPrice(totalPrice)}</strong>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.form_group} data-field="date">
                 <label className={styles.label}>Дата</label>
@@ -292,24 +408,29 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
                 )}
             </div>
 
-            {(slotsLoading || slotsError || availableSlots.length > 0) && (
+            {showTimeSection && (
                 <div className={styles.form_group} data-field="time">
                     <label className={styles.label}>Доступное время</label>
-                    {slotsLoading && <p className={styles.hint}>Ищем свободные слоты...</p>}
-                    {slotsError && !slotsLoading && <p className={styles.hint}>{slotsError}</p>}
-                    {availableSlots.length > 0 && (
+                    {slotsLoading && <p className={styles.hint}>Проверяем свободные слоты...</p>}
+                    {slotsNotice && !slotsLoading && <p className={styles.hint}>{slotsNotice}</p>}
+                    {availableSlots.length > 0 ? (
                         <div className={styles.time_slots}>
                             {availableSlots.map(slot => (
                                 <button
                                     key={slot}
                                     type="button"
-                                    className={`${styles.time_slot} ${selectedTime === slot ? styles.selected : ''}`}
+                                    className={`${styles.time_slot} ${selectedTime === slot ? styles.time_slotSelected : ''}`}
                                     onClick={() => handleTimeSelect(slot)}
+                                    aria-pressed={selectedTime === slot}
                                 >
                                     {slot}
                                 </button>
                             ))}
                         </div>
+                    ) : (
+                        !slotsLoading && (
+                            <p className={styles.hint}>На эту дату нет свободного времени.</p>
+                        )
                     )}
                     {errors.time && (
                         <span className={styles.errorText}>{errors.time}</span>
@@ -381,12 +502,17 @@ const BookingForm = ({ services = [], initialServiceId = '' }) => {
                         Отправка...
                     </>
                 ) : (
-                    'Записаться'
+                    selectedServiceIds.length > 0
+                        ? `Записаться · ${formatPrice(totalPrice)}`
+                        : 'Записаться'
                 )}
             </button>
 
             {submitMessage && (
-                <div className={`${styles.message} ${isSuccess ? styles.success : styles.error}`} role="status">
+                <div
+                    className={`${styles.message} ${isSuccess ? styles.messageSuccess : styles.messageError}`}
+                    role="status"
+                >
                     {submitMessage}
                 </div>
             )}
